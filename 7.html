@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafarSathii – Your Journey Companion</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* =============================================
+       CSS VARIABLES & RESET
+    ============================================= */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cream: #faf6f0;
+            --sand: #e8ddc8;
+            --terracotta: #c7603a;
+            --rust: #a8432a;
+            --forest: #2d4a3e;
+            --sage: #5a7a6a;
+            --gold: #d4a942;
+            --ink: #1a1a1a;
+            --mist: #f0ebe3;
+            --white: #ffffff;
+            --shadow: 0 8px 32px rgba(26, 26, 26, .12);
+            --shadow-lg: 0 20px 60px rgba(26, 26, 26, .18);
+            --radius: 16px;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'DM Sans', sans-serif;
+            --transition: all .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--cream);
+            color: var(--ink);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        /* =============================================
+       UTILITY
+    ============================================= */
+        .hidden {
+            display: none !important;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+
+        /* =============================================
+       NOTIFICATION TOAST
+    ============================================= */
+        #toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--forest);
+            color: var(--white);
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: .9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn .35s ease forwards;
+            min-width: 260px;
+        }
+
+        .toast.error {
+            background: var(--rust);
+        }
+
+        .toast.success {
+            background: var(--forest);
+        }
+
+        .toast.info {
+            background: var(--gold);
+            color: var(--ink);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        /* =============================================
+       NAVIGATION
+    ============================================= */
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            height: 72px;
+            background: rgba(250, 246, 240, .92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sand);
+            transition: var(--transition);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--forest);
+            letter-spacing: -.5px;
+            cursor: pointer;
+        }
+
+        .nav-logo span {
+            color: var(--terracotta);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--ink);
+            font-size: .9rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            background: var(--sand);
+            color: var(--forest);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #user-info {
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--forest);
+            background: var(--mist);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--sand);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--terracotta);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--rust);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(199, 96, 58, .3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--forest);
+            border: 1.5px solid var(--forest);
+        }
+
+        .btn-secondary:hover {
+            background: var(--forest);
+            color: var(--white);
+        }
+
+        .btn-sm {
+            padding: 7px 16px;
+            font-size: .82rem;
+        }
+
+        .btn-danger {
+            background: var(--rust);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #8a3020;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--ink);
+        }
+
+        .btn-gold:hover {
+            background: #b8902e;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 2px;
+            background: var(--ink);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        /* =============================================
+       SECTIONS WRAPPER
+    ============================================= */
+        main {
+            padding-top: 72px;
+        }
+
+        section {
+            display: none;
+        }
+
+        section.active-section {
+            display: block;
+        }
+
+        /* =============================================
+       HOME / HERO
+    ============================================= */
+        #hero {
+            position: relative;
+            min-height: calc(100vh - 72px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--forest) 0%, #1a3028 50%, var(--ink) 100%);
+            overflow: hidden;
+        }
+
+        .hero-bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(212, 169, 66, .15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(199, 96, 58, .2) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            padding: 80px 80px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(212, 169, 66, .2);
+            color: var(--gold);
+            border: 1px solid rgba(212, 169, 66, .4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: var(--white);
+            margin-bottom: 24px;
+        }
+
+        .hero-title em {
+            color: var(--gold);
+            font-style: normal;
+        }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, .72);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stats {
+            position: absolute;
+            right: 80px;
+            bottom: 80px;
+            display: flex;
+            gap: 40px;
+        }
+
+        .hero-stat {
+            text-align: center;
+            color: var(--white);
+        }
+
+        .hero-stat-num {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .hero-stat-label {
+            font-size: .8rem;
+            opacity: .7;
+            letter-spacing: .5px;
+        }
+
+        /* =============================================
+       SECTION WRAPPER
+    ============================================= */
+        .section-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 32px;
+        }
+
+        .section-header {
+            margin-bottom: 48px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            color: #666;
+            margin-top: 10px;
+            font-size: .97rem;
+            line-height: 1.6;
+        }
+
+        /* =============================================
+       SEARCH & FILTER BAR
+    ============================================= */
+        .filter-bar {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .filter-group label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #888;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 14px;
+            border: 1.5px solid var(--sand);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: .9rem;
+            background: var(--cream);
+            color: var(--ink);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: var(--terracotta);
+        }
+
+        /* =============================================
+       PACKAGE GRID
+    ============================================= */
+        #packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+        }
+
+        .package-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--sand);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .package-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-img-wrap {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease;
+        }
+
+        .package-card:hover .card-img-wrap img {
+            transform: scale(1.06);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--forest);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-location {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--terracotta);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .card-name {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--mist);
+        }
+
+        .card-price {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--forest);
+        }
+
+        .card-price span {
+            font-size: .78rem;
+            font-weight: 400;
+            color: #888;
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .card-rating .star {
+            color: var(--gold);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .card-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* No results */
+        .no-results {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .no-results h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: #bbb;
+        }
+
+        /* =============================================
+       MODAL / OVERLAY
+    ============================================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(26, 26, 26, .6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn .2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn .3s cubic-bezier(.4, 0, .2, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(.92);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .modal-close {
+            background: var(--mist);
+            border: none;
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #888;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--sand);
+            color: var(--ink);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: .83rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--sand);
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: .92rem;
+            background: var(--cream);
+            color: var(--ink);
+            transition: var(--transition);
+            outline: none;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--terracotta);
+            background: var(--white);
+        }
+
+        .form-error {
+            color: var(--rust);
+            font-size: .8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-footer {
+            margin-top: 8px;
+            font-size: .85rem;
+            color: #888;
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: var(--terracotta);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* =============================================
+       AUTH PAGE
+    ============================================= */
+        #auth-section {
+            min-height: calc(100vh - 72px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--mist) 0%, var(--sand) 100%);
+            padding: 40px 20px;
+        }
+
+        .auth-box {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 50px 44px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .auth-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--forest);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .auth-logo span {
+            color: var(--terracotta);
+        }
+
+        .auth-tagline {
+            text-align: center;
+            color: #888;
+            font-size: .88rem;
+            margin-bottom: 32px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 9px;
+            text-align: center;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: var(--transition);
+            color: #888;
+        }
+
+        .auth-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        /* =============================================
+       BOOKINGS SECTION
+    ============================================= */
+        .bookings-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #aaa;
+        }
+
+        .bookings-empty h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 22px;
+        }
+
+        .booking-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .booking-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .booking-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            background: rgba(45, 74, 62, .1);
+            color: var(--forest);
+        }
+
+        .booking-pkg {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .booking-detail {
+            font-size: .85rem;
+            color: #777;
+            margin-bottom: 4px;
+        }
+
+        .booking-detail strong {
+            color: var(--ink);
+        }
+
+        .booking-id {
+            font-size: .72rem;
+            color: #bbb;
+            margin-top: 14px;
+            font-family: monospace;
+        }
+
+        /* =============================================
+       ADMIN PANEL
+    ============================================= */
+        .admin-login-box {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .admin-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--mist);
+        }
+
+        .admin-pkg-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-pkg-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--mist);
+            border-radius: 10px;
+            gap: 10px;
+        }
+
+        .admin-pkg-name {
+            font-size: .88rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .admin-pkg-loc {
+            font-size: .78rem;
+            color: #999;
+        }
+
+        /* =============================================
+       MAP MODAL
+    ============================================= */
+        .map-modal {
+            max-width: 700px;
+        }
+
+        .map-modal iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        /* =============================================
+       CONFIRMATION MODAL
+    ============================================= */
+        .confirm-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(45, 74, 62, .1);
+            color: var(--forest);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 24px;
+        }
+
+        .confirm-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .confirm-subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 24px;
+            font-size: .92rem;
+        }
+
+        .confirm-details {
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 18px;
+            font-size: .88rem;
+            line-height: 2;
+        }
+
+        .confirm-details strong {
+            color: var(--forest);
+        }
+
+        /* =============================================
+       FOOTER
+    ============================================= */
+        footer {
+            background: var(--ink);
+            color: rgba(255, 255, 255, .6);
+            text-align: center;
+            padding: 28px;
+            font-size: .82rem;
+        }
+
+        footer strong {
+            color: var(--white);
+        }
+
+        /* =============================================
+       RESPONSIVE
+    ============================================= */
+        @media (max-width: 768px) {
+            #navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: var(--cream);
+                padding: 16px;
+                border-bottom: 1px solid var(--sand);
+                gap: 4px;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero-content {
+                padding: 60px 28px;
+            }
+
+            .hero-stats {
+                position: static;
+                padding: 0 28px 60px;
+                flex-wrap: wrap;
+                gap: 24px;
+            }
+
+            #hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-box {
+                padding: 32px 24px;
+            }
+
+            .section-wrap {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- NAVIGATION -->
+    <nav id="navbar">
+        <div class="nav-logo" onclick="showSection('home')">Safar<span>Sathii</span></div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#" onclick="showSection('home'); return false;">Home</a></li>
+            <li><a href="#" onclick="showSection('packages'); return false;">Packages</a></li>
+            <li><a href="#" onclick="requireLogin('bookings'); return false;">My Bookings</a></li>
+            <li><a href="#" onclick="showSection('admin'); return false;">Admin</a></li>
+        </ul>
+        <div class="nav-right">
+            <div id="user-info" class="hidden"></div>
+            <button class="btn btn-secondary btn-sm hidden" id="logout-btn" onclick="logout()">Logout</button>
+            <button class="btn btn-primary btn-sm" id="login-nav-btn" onclick="showSection('auth')">Sign In</button>
+        </div>
+        <div class="hamburger" id="hamburger" onclick="toggleNav()">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+
+        <!-- ============ HOME ============ -->
+        <section id="home-section" class="active-section">
+            <div id="hero">
+                <div class="hero-bg-pattern"></div>
+                <div class="hero-content">
+                    <div class="hero-tag">✈ Your Journey Companion</div>
+                    <h1 class="hero-title">Explore the World with <em>SafarSathii</em></h1>
+                    <p class="hero-subtitle">Handcrafted travel experiences across India and beyond. Discover hidden
+                        gems, iconic destinations, and once-in-a-lifetime adventures.</p>
+                    <div class="hero-cta">
+                        <button class="btn btn-primary" onclick="showSection('packages')">Explore Packages</button>
+                        <button class="btn btn-secondary" style="color:white;border-color:rgba(255,255,255,.4);"
+                            onclick="showSection('auth')">Create Account</button>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">50+</div>
+                        <div class="hero-stat-label">Destinations</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">2K+</div>
+                        <div class="hero-stat-label">Happy Travelers</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">4.9★</div>
+                        <div class="hero-stat-label">Avg Rating</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ AUTH ============ -->
+        <section id="auth-section">
+            <div
+                style="min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--mist) 0%,var(--sand) 100%);padding:40px 20px;">
+                <div class="auth-box">
+                    <div class="auth-logo">Safar<span>Sathii</span></div>
+                    <p class="auth-tagline">Your journey begins here 🌍</p>
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
+                        <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+                    </div>
+
+                    <!-- LOGIN FORM -->
+                    <div class="auth-form active" id="login-form">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="login-username" placeholder="Enter username" />
+                            <div class="form-error" id="login-user-err">Please enter username.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="login-password" placeholder="Enter password" />
+                            <div class="form-error" id="login-pass-err">Please enter password.</div>
+                        </div>
+                        <div class="form-error" id="login-err"
+                            style="display:none;margin-bottom:12px;font-size:.88rem;"></div>
+                        <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">Sign In</button>
+                    </div>
+
+                    <!-- SIGNUP FORM -->
+                    <div class="auth-form" id="signup-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signup-name" placeholder="Your full name" />
+                            <div class="form-error" id="signup-name-err">Please enter your name.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="signup-username" placeholder="Choose a username" />
+                            <div class="form-error" id="signup-user-err">Please enter a username.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="signup-email" placeholder="you@example.com" />
+                            <div class="form-error" id="signup-email-err">Please enter a valid email.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="signup-password" placeholder="Min 6 characters" />
+                            <div class="form-error" id="signup-pass-err">Password must be at least 6 characters.</div>
+                        </div>
+                        <div class="form-error" id="signup-err"
+                            style="display:none;margin-bottom:12px;font-size:.88rem;"></div>
+                        <button class="btn btn-primary" style="width:100%;" onclick="doSignup()">Create Account</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PACKAGES ============ -->
+        <section id="packages-section">
+            <div class="section-wrap">
+                <div class="section-header">
+                    <div class="section-tag">✈ Explore</div>
+                    <h2 class="section-title">Travel Packages</h2>
+                    <p class="section-subtitle">Curated experiences for every kind of traveler. Find your perfect
+                        getaway.</p>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Search Destination</label>
+                            <input type="text" id="search-input" placeholder="e.g. Goa, Manali..."
+                                oninput="applyFilters()" />
+                        </div>
+                        <div class="filter-group">
+                            <label>Max Price (₹)</label>
+                            <select id="price-filter" onchange="applyFilters()">
+                                <option value="">Any Price</option>
+                                <option value="15000">Under ₹15,000</option>
+                                <option value="25000">Under ₹25,000</option>
+                                <option value="40000">Under ₹40,000</option>
+                                <option value="60000">Under ₹60,000</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Min Rating</label>
+                            <select id="rating-filter" onchange="applyFilters()">
+                                <option value="">Any Rating</option>
+                                <option value="4">4★ & above</option>
+                                <option value="4.5">4.5★ & above</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort By</label>
+                            <select id="sort-filter" onchange="applyFilters()">
+                                <option value="">Default</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="rating-desc">Rating: High to Low</option>
+                                <option value="name-asc">Name: A–Z</option>
+                            </select>
+                        </div>
+                        <div class="filter-group" style="flex:0;min-width:auto;">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package Grid -->
+                <div id="packages-grid"></div>
+            </div>
+        </section>
+
+        <!-- ============ BOOKINGS ============ -->
+        <section id="bookings-section">
+            <div class="section-wrap">
+                <div class="section-header">
+                    <div class="section-tag">📋 My Trips</div>
+                    <h2 class="section-title">Booking History</h2>
+                    <p class="section-subtitle">View all your past and upcoming bookings.</p>
+                </div>
+                <div id="bookings-container"></div>
+            </div>
+        </section>
+
+        <!-- ============ ADMIN ============ -->
+        <section id="admin-section">
+            <div class="section-wrap">
+
+                <!-- Admin Login -->
+                <div id="admin-login-wrap">
+                    <div class="section-header">
+                        <div class="section-tag">🔐 Admin</div>
+                        <h2 class="section-title">Admin Panel</h2>
+                    </div>
+                    <div class="admin-login-box">
+                        <div class="form-group">
+                            <label>Admin Username</label>
+                            <input type="text" id="admin-user-input" placeholder="admin" />
+                        </div>
+                        <div class="form-group">
+                            <label>Admin Password</label>
+                            <input type="password" id="admin-pass-input" placeholder="admin" />
+                        </div>
+                        <div class="form-error" id="admin-login-err" style="display:none;margin-bottom:12px;"></div>
+                        <button class="btn btn-primary" style="width:100%;" onclick="doAdminLogin()">Login as
+                            Admin</button>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard -->
+                <div id="admin-dashboard-wrap" class="hidden">
+                    <div class="section-header"
+                        style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <div class="section-tag">🛠 Dashboard</div>
+                            <h2 class="section-title">Admin Dashboard</h2>
+                        </div>
+                        <button class="btn btn-secondary" onclick="adminLogout()">Logout Admin</button>
+                    </div>
+                    <div class="admin-grid">
+                        <!-- Add Package -->
+                        <div class="admin-card">
+                            <div class="admin-card-title">➕ Add New Package</div>
+                            <div class="form-group">
+                                <label>Package Name</label>
+                                <input type="text" id="a-name" placeholder="e.g. Goa Beach Escape" />
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" id="a-location" placeholder="e.g. Goa, India" />
+                            </div>
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" id="a-price" placeholder="e.g. 12000" />
+                            </div>
+                            <div class="form-group">
+                                <label>Rating (1-5)</label>
+                                <input type="number" id="a-rating" min="1" max="5" step="0.1" placeholder="e.g. 4.5" />
+                            </div>
+                            <div class="form-group">
+                                <label>Image URL</label>
+                                <input type="text" id="a-image" placeholder="https://... (leave blank for default)" />
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="a-desc" rows="3"
+                                    placeholder="Short description of the package..."></textarea>
+                            </div>
+                            <div class="form-error" id="admin-add-err" style="display:none;margin-bottom:12px;"></div>
+                            <button class="btn btn-primary" style="width:100%;" onclick="adminAddPackage()">Add
+                                Package</button>
+                        </div>
+
+                        <!-- Package List -->
+                        <div class="admin-card">
+                            <div class="admin-card-title">📦 Manage Packages</div>
+                            <div id="admin-pkg-list" class="admin-pkg-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ BOOKING MODAL ============ -->
+    <div class="modal-overlay hidden" id="booking-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Book This Package</div>
+                    <div style="font-size:.85rem;color:#888;margin-top:4px;" id="booking-pkg-subtitle"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal('booking-modal')">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="b-name" placeholder="As on ID proof" />
+                <div class="form-error" id="b-name-err">Please enter your full name.</div>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" id="b-phone" placeholder="10-digit mobile number" />
+                <div class="form-error" id="b-phone-err">Please enter a valid 10-digit phone number.</div>
+            </div>
+            <div class="form-group">
+                <label>Travel Date</label>
+                <input type="date" id="b-date" />
+                <div class="form-error" id="b-date-err">Please select a future date.</div>
+            </div>
+            <div class="form-group">
+                <label>No. of Travelers</label>
+                <select id="b-travelers">
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                    <option value="4">4 People</option>
+                    <option value="5">5+ People</option>
+                </select>
+            </div>
+            <div class="form-error" id="b-general-err" style="display:none;margin-bottom:12px;"></div>
+            <button class="btn btn-primary" style="width:100%;" onclick="submitBooking()">Confirm Booking</button>
+        </div>
+    </div>
+
+    <!-- ============ CONFIRMATION MODAL ============ -->
+    <div class="modal-overlay hidden" id="confirm-modal">
+        <div class="modal">
+            <div style="text-align:center;">
+                <div class="confirm-icon">✓</div>
+                <div class="confirm-title">Booking Confirmed! 🎉</div>
+                <p class="confirm-subtitle">Your adventure is set. Get ready to explore!</p>
+                <div class="confirm-details" id="confirm-details-body"></div>
+                <button class="btn btn-primary" style="width:100%;margin-top:24px;"
+                    onclick="closeModal('confirm-modal');showSection('bookings')">View My Bookings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MAP MODAL ============ -->
+    <div class="modal-overlay hidden" id="map-modal">
+        <div class="modal map-modal">
+            <div class="modal-header">
+                <div class="modal-title" id="map-title">Location Map</div>
+                <button class="modal-close" onclick="closeModal('map-modal')">✕</button>
+            </div>
+            <iframe id="map-iframe" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Made with ♥ by <strong>SafarSathii</strong> — Your Journey Companion &copy; 2025</p>
+    </footer>
+
+    <!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+    <script>
+        /* ================================================================
+           DATA STORE — Default travel packages
+        ================================================================ */
+        const DEFAULT_PACKAGES = [
+            {
+                id: 'pkg1', name: 'Kerala Backwaters Serenity',
+                location: 'Kerala, India', price: 18500, rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80',
+                description: 'Float through emerald backwaters on a traditional houseboat surrounded by lush paddy fields.'
+            },
+            {
+                id: 'pkg2', name: 'Goa Sun & Sand Escape',
+                location: 'Goa, India', price: 12800, rating: 4.6,
+                image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
+                description: 'Relax on Goa\'s sun-kissed beaches, enjoy vibrant nightlife and Portuguese heritage.'
+            },
+            {
+                id: 'pkg3', name: 'Himalayan Snow Trek – Manali',
+                location: 'Manali, Himachal Pradesh', price: 22000, rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1527489377706-5bf97e608852?w=600&q=80',
+                description: 'Trek through snow-capped peaks, alpine meadows and serene mountain villages.'
+            },
+            {
+                id: 'pkg4', name: 'Rajasthan Royal Heritage Tour',
+                location: 'Jaipur, Rajasthan', price: 31000, rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80',
+                description: 'Explore the Pink City\'s magnificent forts, palaces and the opulent royal culture.'
+            },
+            {
+                id: 'pkg5', name: 'Andaman Island Adventure',
+                location: 'Andaman & Nicobar', price: 38000, rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600&q=80',
+                description: 'Crystal-clear waters, coral reefs and tropical forests await in this island paradise.'
+            },
+            {
+                id: 'pkg6', name: 'Varanasi Spiritual Journey',
+                location: 'Varanasi, Uttar Pradesh', price: 10500, rating: 4.5,
+                image: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=600&q=80',
+                description: 'Experience the ancient ghats, sunrise boat rides and the eternal spiritual energy of Kashi.'
+            },
+            {
+                id: 'pkg7', name: 'Coorg Coffee Trail',
+                location: 'Coorg, Karnataka', price: 14200, rating: 4.6,
+                image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&q=80',
+                description: 'Walk through misty coffee and spice plantations in the Scotland of India.'
+            },
+            {
+                id: 'pkg8', name: 'Spiti Valley Expedition',
+                location: 'Spiti Valley, Himachal', price: 28000, rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1617369120004-4042c1a42e07?w=600&q=80',
+                description: 'Journey to remote monasteries and stark high-altitude deserts under a vast open sky.'
+            },
+            {
+                id: 'pkg9', name: 'Mysuru Palaces & Heritage',
+                location: 'Mysuru, Karnataka', price: 9800, rating: 4.5,
+                image: 'https://images.unsplash.com/photo-1600100399109-3c855e5d1517?w=600&q=80',
+                description: 'Marvel at the illuminated Mysore Palace and indulge in rich Wodeyar-era heritage.'
+            }
+        ];
+
+        /* ================================================================
+           STATE
+        ================================================================ */
+        let packages = JSON.parse(localStorage.getItem('ss_packages') || 'null') || DEFAULT_PACKAGES;
+        let bookings = JSON.parse(localStorage.getItem('ss_bookings') || '[]');
+        let users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+        let currentUser = JSON.parse(localStorage.getItem('ss_current_user') || 'null');
+        let adminLoggedIn = false;
+        let currentBookingPkg = null; // package being booked
+
+        /* ================================================================
+           HELPERS – Persist to localStorage
+        ================================================================ */
+        function savePackages() { localStorage.setItem('ss_packages', JSON.stringify(packages)); }
+        function saveBookings() { localStorage.setItem('ss_bookings', JSON.stringify(bookings)); }
+        function saveUsers() { localStorage.setItem('ss_users', JSON.stringify(users)); }
+
+        /* ================================================================
+           TOAST NOTIFICATIONS
+        ================================================================ */
+        function showToast(msg, type = 'success', duration = 3500) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => {
+                t.style.animation = 'slideOut .35s ease forwards';
+                setTimeout(() => t.remove(), 350);
+            }, duration);
+        }
+
+        /* ================================================================
+           NAVIGATION
+        ================================================================ */
+        function showSection(id) {
+            document.querySelectorAll('main section').forEach(s => s.classList.remove('active-section'));
+            const el = document.getElementById(id + '-section');
+            if (el) el.classList.add('active-section');
+
+            // Close mobile nav
+            document.getElementById('nav-links').classList.remove('open');
+
+            // Section-specific init
+            if (id === 'packages') renderPackages();
+            if (id === 'bookings') renderBookings();
+            if (id === 'admin') initAdminView();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function requireLogin(section) {
+            if (!currentUser) {
+                showToast('Please sign in first to view your bookings.', 'info');
+                showSection('auth');
+            } else {
+                showSection(section);
+            }
+        }
+
+        function toggleNav() {
+            document.getElementById('nav-links').classList.toggle('open');
+        }
+
+        /* ================================================================
+           UPDATE NAV UI
+        ================================================================ */
+        function updateNavUI() {
+            const info = document.getElementById('user-info');
+            const logoutB = document.getElementById('logout-btn');
+            const loginB = document.getElementById('login-nav-btn');
+
+            if (currentUser) {
+                info.textContent = '👤 ' + currentUser.username;
+                info.classList.remove('hidden');
+                logoutB.classList.remove('hidden');
+                loginB.classList.add('hidden');
+            } else {
+                info.classList.add('hidden');
+                logoutB.classList.add('hidden');
+                loginB.classList.remove('hidden');
+            }
+        }
+
+        /* ================================================================
+           AUTH – TAB SWITCH
+        ================================================================ */
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById(tab + '-form').classList.add('active');
+        }
+
+        /* ================================================================
+           AUTH – SIGN UP
+        ================================================================ */
+        function doSignup() {
+            const name = document.getElementById('signup-name').value.trim();
+            const uname = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const pass = document.getElementById('signup-password').value;
+            let valid = true;
+
+            // Clear old errors
+            ['signup-name-err', 'signup-user-err', 'signup-email-err', 'signup-pass-err', 'signup-err'].forEach(id => {
+                const el = document.getElementById(id); el.style.display = 'none';
+            });
+
+            if (!name) { document.getElementById('signup-name-err').style.display = 'block'; valid = false; }
+            if (!uname) { document.getElementById('signup-user-err').style.display = 'block'; valid = false; }
+            if (!email || !email.includes('@')) { document.getElementById('signup-email-err').style.display = 'block'; valid = false; }
+            if (pass.length < 6) { document.getElementById('signup-pass-err').style.display = 'block'; valid = false; }
+
+            if (!valid) return;
+
+            // Check duplicate username
+            if (users.find(u => u.username === uname)) {
+                const e = document.getElementById('signup-err');
+                e.textContent = 'Username already taken. Try another.';
+                e.style.display = 'block'; return;
+            }
+
+            const newUser = { name, username: uname, email, password: pass };
+            users.push(newUser); saveUsers();
+            currentUser = newUser;
+            localStorage.setItem('ss_current_user', JSON.stringify(currentUser));
+            updateNavUI();
+            showToast('Account created! Welcome to SafarSathii 🎉', 'success');
+            showSection('packages');
+        }
+
+        /* ================================================================
+           AUTH – LOGIN
+        ================================================================ */
+        function doLogin() {
+            const uname = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value;
+            let valid = true;
+
+            ['login-user-err', 'login-pass-err', 'login-err'].forEach(id => {
+                const el = document.getElementById(id); el.style.display = 'none';
+            });
+
+            if (!uname) { document.getElementById('login-user-err').style.display = 'block'; valid = false; }
+            if (!pass) { document.getElementById('login-pass-err').style.display = 'block'; valid = false; }
+            if (!valid) return;
+
+            const user = users.find(u => u.username === uname && u.password === pass);
+            if (!user) {
+                const e = document.getElementById('login-err');
+                e.textContent = 'Invalid username or password.';
+                e.style.display = 'block'; return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('ss_current_user', JSON.stringify(currentUser));
+            updateNavUI();
+            showToast(`Welcome back, ${user.name}! 👋`, 'success');
+            showSection('packages');
+        }
+
+        /* ================================================================
+           LOGOUT
+        ================================================================ */
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('ss_current_user');
+            updateNavUI();
+            showToast('Logged out successfully.', 'info');
+            showSection('home');
+        }
+
+        /* ================================================================
+           RENDER PACKAGES
+        ================================================================ */
+        function renderPackages(list) {
+            const grid = document.getElementById('packages-grid');
+            const pkgs = list || packages;
+
+            if (!pkgs.length) {
+                grid.innerHTML = `<div class="no-results"><h3>No packages found</h3><p>Try adjusting your filters.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = pkgs.map(p => `
+    <div class="package-card" id="card-${p.id}">
+      <div class="card-img-wrap">
+        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80'"/>
+        <div class="card-badge">⭐ ${p.rating}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-location">📍 ${p.location}</div>
+        <div class="card-name">${p.name}</div>
+        <p style="font-size:.84rem;color:#777;line-height:1.55;flex:1;">${p.description || ''}</p>
+        <div class="card-meta">
+          <div class="card-price">₹${Number(p.price).toLocaleString('en-IN')} <span>/person</span></div>
+          <div class="card-rating"><span class="star">★</span>${p.rating}</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openMap('${p.location}', '${p.name}')">🗺 Map</button>
+          <button class="btn btn-primary btn-sm" onclick="openBooking('${p.id}')">Book Now</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+        }
+
+        /* ================================================================
+           FILTER & SEARCH
+        ================================================================ */
+        function applyFilters() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const maxPrice = document.getElementById('price-filter').value;
+            const minRating = document.getElementById('rating-filter').value;
+            const sort = document.getElementById('sort-filter').value;
+
+            let result = [...packages];
+
+            if (search) result = result.filter(p => p.location.toLowerCase().includes(search) || p.name.toLowerCase().includes(search));
+            if (maxPrice) result = result.filter(p => p.price <= Number(maxPrice));
+            if (minRating) result = result.filter(p => p.rating >= Number(minRating));
+
+            if (sort === 'price-asc') result.sort((a, b) => a.price - b.price);
+            if (sort === 'price-desc') result.sort((a, b) => b.price - a.price);
+            if (sort === 'rating-desc') result.sort((a, b) => b.rating - a.rating);
+            if (sort === 'name-asc') result.sort((a, b) => a.name.localeCompare(b.name));
+
+            renderPackages(result);
+        }
+
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('price-filter').value = '';
+            document.getElementById('rating-filter').value = '';
+            document.getElementById('sort-filter').value = '';
+            renderPackages();
+        }
+
+        /* ================================================================
+           MODAL HELPERS
+        ================================================================ */
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // Close modal when clicking overlay
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === this) this.classList.add('hidden');
+            });
+        });
+
+        /* ================================================================
+           BOOKING – OPEN FORM
+        ================================================================ */
+        function openBooking(pkgId) {
+            if (!currentUser) {
+                showToast('Please sign in to book a package.', 'info');
+                showSection('auth');
+                return;
+            }
+
+            const pkg = packages.find(p => p.id === pkgId);
+            if (!pkg) return;
+
+            currentBookingPkg = pkg;
+            document.getElementById('booking-pkg-subtitle').textContent =
+                `${pkg.name} — ₹${Number(pkg.price).toLocaleString('en-IN')} / person`;
+
+            // Clear form
+            ['b-name', 'b-phone', 'b-date'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('b-travelers').value = '1';
+            ['b-name-err', 'b-phone-err', 'b-date-err', 'b-general-err'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            // Set min date to tomorrow
+            const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('b-date').min = tomorrow.toISOString().split('T')[0];
+
+            openModal('booking-modal');
+        }
+
+        /* ================================================================
+           BOOKING – SUBMIT
+        ================================================================ */
+        function submitBooking() {
+            const name = document.getElementById('b-name').value.trim();
+            const phone = document.getElementById('b-phone').value.trim();
+            const date = document.getElementById('b-date').value;
+            const travelers = document.getElementById('b-travelers').value;
+            let valid = true;
+
+            ['b-name-err', 'b-phone-err', 'b-date-err', 'b-general-err'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            if (!name) { document.getElementById('b-name-err').style.display = 'block'; valid = false; }
+            if (!/^\d{10}$/.test(phone)) { document.getElementById('b-phone-err').style.display = 'block'; valid = false; }
+
+            if (!date) {
+                document.getElementById('b-date-err').style.display = 'block'; valid = false;
+            } else {
+                const selected = new Date(date); const today = new Date(); today.setHours(0, 0, 0, 0);
+                if (selected <= today) { document.getElementById('b-date-err').style.display = 'block'; valid = false; }
+            }
+
+            if (!valid) return;
+
+            // Create booking
+            const booking = {
+                id: 'BK' + Date.now(),
+                userId: currentUser.username,
+                pkgId: currentBookingPkg.id,
+                pkgName: currentBookingPkg.name,
+                pkgLocation: currentBookingPkg.location,
+                pkgPrice: currentBookingPkg.price,
+                travelerName: name,
+                phone, date, travelers: Number(travelers),
+                totalPrice: currentBookingPkg.price * Number(travelers),
+                bookedAt: new Date().toISOString()
+            };
+
+            bookings.push(booking); saveBookings();
+            closeModal('booking-modal');
+
+            // Show confirmation
+            document.getElementById('confirm-details-body').innerHTML = `
+    <div><strong>Package:</strong> ${booking.pkgName}</div>
+    <div><strong>Location:</strong> 📍 ${booking.pkgLocation}</div>
+    <div><strong>Traveler:</strong> ${booking.travelerName}</div>
+    <div><strong>Travel Date:</strong> ${new Date(booking.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+    <div><strong>Travelers:</strong> ${booking.travelers} person(s)</div>
+    <div><strong>Total Amount:</strong> ₹${Number(booking.totalPrice).toLocaleString('en-IN')}</div>
+    <div><strong>Booking ID:</strong> <span style="font-family:monospace;font-size:.8em;color:#888">${booking.id}</span></div>
+  `;
+            openModal('confirm-modal');
+            showToast('Booking confirmed! Have a great trip 🌍', 'success');
+        }
+
+        /* ================================================================
+           BOOKINGS PAGE – RENDER
+        ================================================================ */
+        function renderBookings() {
+            if (!currentUser) { showSection('auth'); return; }
+
+            const container = document.getElementById('bookings-container');
+            const myBookings = bookings.filter(b => b.userId === currentUser.username)
+                .sort((a, b) => new Date(b.bookedAt) - new Date(a.bookedAt));
+
+            if (!myBookings.length) {
+                container.innerHTML = `
+      <div class="bookings-empty">
+        <h3>No bookings yet</h3>
+        <p>Explore our packages and book your first adventure!</p>
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="showSection('packages')">Browse Packages</button>
+      </div>`;
+                return;
+            }
+
+            container.innerHTML = `<div class="bookings-grid">` +
+                myBookings.map(b => `
+      <div class="booking-card">
+        <div class="booking-status">✓ Confirmed</div>
+        <div class="booking-pkg">${b.pkgName}</div>
+        <div class="booking-detail">📍 <strong>Location:</strong> ${b.pkgLocation}</div>
+        <div class="booking-detail">📅 <strong>Travel Date:</strong> ${new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        <div class="booking-detail">👥 <strong>Travelers:</strong> ${b.travelers} person(s)</div>
+        <div class="booking-detail">💰 <strong>Total Paid:</strong> ₹${Number(b.totalPrice).toLocaleString('en-IN')}</div>
+        <div class="booking-detail">🧑 <strong>Booked for:</strong> ${b.travelerName}</div>
+        <div class="booking-id">Booking ID: ${b.id}</div>
+      </div>
+    `).join('') + `</div>`;
+        }
+
+        /* ================================================================
+           MAP
+        ================================================================ */
+        function openMap(location, name) {
+            document.getElementById('map-title').textContent = '📍 ' + name;
+            const q = encodeURIComponent(location);
+            document.getElementById('map-iframe').src =
+                `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3Rao&q=${q}`;
+            openModal('map-modal');
+        }
+
+        /* ================================================================
+           ADMIN – INIT VIEW
+        ================================================================ */
+        function initAdminView() {
+            if (adminLoggedIn) {
+                document.getElementById('admin-login-wrap').classList.add('hidden');
+                document.getElementById('admin-dashboard-wrap').classList.remove('hidden');
+                renderAdminPackageList();
+            } else {
+                document.getElementById('admin-login-wrap').classList.remove('hidden');
+                document.getElementById('admin-dashboard-wrap').classList.add('hidden');
+            }
+        }
+
+        /* ================================================================
+           ADMIN – LOGIN
+        ================================================================ */
+        function doAdminLogin() {
+            const u = document.getElementById('admin-user-input').value.trim();
+            const p = document.getElementById('admin-pass-input').value.trim();
+            const err = document.getElementById('admin-login-err');
+            err.style.display = 'none';
+
+            if (u === 'admin' && p === 'admin') {
+                adminLoggedIn = true;
+                initAdminView();
+                showToast('Welcome, Admin! 🛠', 'success');
+            } else {
+                err.textContent = 'Invalid admin credentials.';
+                err.style.display = 'block';
+            }
+        }
+
+        function adminLogout() {
+            adminLoggedIn = false;
+            document.getElementById('admin-user-input').value = '';
+            document.getElementById('admin-pass-input').value = '';
+            initAdminView();
+            showToast('Admin logged out.', 'info');
+        }
+
+        /* ================================================================
+           ADMIN – RENDER PACKAGE LIST
+        ================================================================ */
+        function renderAdminPackageList() {
+            const list = document.getElementById('admin-pkg-list');
+            if (!packages.length) {
+                list.innerHTML = '<p style="color:#aaa;font-size:.88rem;">No packages yet.</p>';
+                return;
+            }
+            list.innerHTML = packages.map(p => `
+    <div class="admin-pkg-item">
+      <div>
+        <div class="admin-pkg-name">${p.name}</div>
+        <div class="admin-pkg-loc">📍 ${p.location} &nbsp;·&nbsp; ₹${Number(p.price).toLocaleString('en-IN')}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="adminDeletePackage('${p.id}')">Delete</button>
+    </div>
+  `).join('');
+        }
+
+        /* ================================================================
+           ADMIN – ADD PACKAGE
+        ================================================================ */
+        function adminAddPackage() {
+            const name = document.getElementById('a-name').value.trim();
+            const location = document.getElementById('a-location').value.trim();
+            const price = Number(document.getElementById('a-price').value);
+            const rating = Number(document.getElementById('a-rating').value);
+            const image = document.getElementById('a-image').value.trim();
+            const desc = document.getElementById('a-desc').value.trim();
+            const err = document.getElementById('admin-add-err');
+            err.style.display = 'none';
+
+            if (!name || !location || !price || !rating) {
+                err.textContent = 'Please fill in all required fields (name, location, price, rating).';
+                err.style.display = 'block'; return;
+            }
+            if (rating < 1 || rating > 5) {
+                err.textContent = 'Rating must be between 1 and 5.'; err.style.display = 'block'; return;
+            }
+
+            const newPkg = {
+                id: 'pkg' + Date.now(), name, location, price, rating,
+                image: image || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80',
+                description: desc || 'An amazing travel experience awaits you.'
+            };
+
+            packages.push(newPkg); savePackages();
+            renderAdminPackageList();
+            showToast(`Package "${name}" added successfully!`, 'success');
+
+            // Clear fields
+            ['a-name', 'a-location', 'a-price', 'a-rating', 'a-image', 'a-desc'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        }
+
+        /* ================================================================
+           ADMIN – DELETE PACKAGE
+        ================================================================ */
+        function adminDeletePackage(pkgId) {
+            const pkg = packages.find(p => p.id === pkgId);
+            if (!pkg) return;
+            if (!confirm(`Delete "${pkg.name}"? This cannot be undone.`)) return;
+
+            packages = packages.filter(p => p.id !== pkgId);
+            savePackages();
+            renderAdminPackageList();
+            showToast(`Package deleted.`, 'error');
+        }
+
+        /* ================================================================
+           INIT
+        ================================================================ */
+        function init() {
+            updateNavUI();
+            // Restore session
+            if (!currentUser) {
+                // still show home
+            }
+            // Show home by default
+            showSection('home');
+        }
+
+        // Boot!
+        init();
+    </script>
+</body>
+
+</html>
