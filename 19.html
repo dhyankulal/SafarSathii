@@ -1,0 +1,3616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafarSathii – Your Journey Companion</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* =============================================
+   CSS VARIABLES & RESET
+============================================= */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --cream: #faf6f0;
+            --sand: #e8ddc8;
+            --terracotta: #c7603a;
+            --rust: #a8432a;
+            --forest: #2d4a3e;
+            --sage: #5a7a6a;
+            --gold: #d4a942;
+            --ink: #1a1a1a;
+            --mist: #f0ebe3;
+            --white: #ffffff;
+            --blue: #2563eb;
+            --blue-light: #eff6ff;
+            --purple: #7c3aed;
+            --purple-light: #f5f3ff;
+            --shadow: 0 8px 32px rgba(26, 26, 26, .12);
+            --shadow-lg: 0 20px 60px rgba(26, 26, 26, .18);
+            --radius: 16px;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'DM Sans', sans-serif;
+            --transition: all .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--cream);
+            color: var(--ink);
+            overflow-x: hidden;
+            min-height: 100vh
+        }
+
+        img {
+            max-width: 100%;
+            display: block
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        /* =============================================
+   TOAST
+============================================= */
+        #toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .toast {
+            background: var(--forest);
+            color: var(--white);
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: .9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn .35s ease forwards;
+            min-width: 260px
+        }
+
+        .toast.error {
+            background: var(--rust)
+        }
+
+        .toast.success {
+            background: var(--forest)
+        }
+
+        .toast.info {
+            background: var(--gold);
+            color: var(--ink)
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1
+            }
+
+            to {
+                transform: translateX(120%);
+                opacity: 0
+            }
+        }
+
+        /* =============================================
+   NAVIGATION
+============================================= */
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            height: 72px;
+            background: rgba(250, 246, 240, .95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sand);
+            transition: var(--transition)
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--forest);
+            letter-spacing: -.5px;
+            cursor: pointer
+        }
+
+        .nav-logo span {
+            color: var(--terracotta)
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--ink);
+            font-size: .88rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap
+        }
+
+        .nav-links a:hover {
+            background: var(--sand);
+            color: var(--forest)
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0
+        }
+
+        #user-info {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--forest);
+            background: var(--mist);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--sand)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none
+        }
+
+        .btn-primary {
+            background: var(--terracotta);
+            color: var(--white)
+        }
+
+        .btn-primary:hover {
+            background: var(--rust);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(199, 96, 58, .3)
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--forest);
+            border: 1.5px solid var(--forest)
+        }
+
+        .btn-secondary:hover {
+            background: var(--forest);
+            color: var(--white)
+        }
+
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: .8rem
+        }
+
+        .btn-danger {
+            background: var(--rust);
+            color: var(--white)
+        }
+
+        .btn-danger:hover {
+            background: #8a3020
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--ink)
+        }
+
+        .btn-gold:hover {
+            background: #b8902e
+        }
+
+        .btn-blue {
+            background: var(--blue);
+            color: var(--white)
+        }
+
+        .btn-blue:hover {
+            background: #1d4ed8
+        }
+
+        .btn-purple {
+            background: var(--purple);
+            color: var(--white)
+        }
+
+        .btn-purple:hover {
+            background: #6d28d9
+        }
+
+        .btn-green {
+            background: #16a34a;
+            color: var(--white)
+        }
+
+        .btn-green:hover {
+            background: #15803d
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 2px;
+            background: var(--ink);
+            border-radius: 2px;
+            transition: var(--transition)
+        }
+
+        /* =============================================
+   SECTIONS
+============================================= */
+        main {
+            padding-top: 72px
+        }
+
+        section {
+            display: none
+        }
+
+        section.active-section {
+            display: block
+        }
+
+        .section-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 32px
+        }
+
+        .section-header {
+            margin-bottom: 48px
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 12px
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.2
+        }
+
+        .section-subtitle {
+            color: #666;
+            margin-top: 10px;
+            font-size: .97rem;
+            line-height: 1.6
+        }
+
+        /* =============================================
+   HERO
+============================================= */
+        #hero {
+            position: relative;
+            min-height: calc(100vh - 72px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--forest) 0%, #1a3028 50%, var(--ink) 100%);
+            overflow: hidden
+        }
+
+        .hero-bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(212, 169, 66, .15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(199, 96, 58, .2) 0%, transparent 40%)
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            padding: 80px
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(212, 169, 66, .2);
+            color: var(--gold);
+            border: 1px solid rgba(212, 169, 66, .4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: var(--white);
+            margin-bottom: 24px
+        }
+
+        .hero-title em {
+            color: var(--gold);
+            font-style: normal
+        }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, .72);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 40px
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap
+        }
+
+        .hero-stats {
+            position: absolute;
+            right: 80px;
+            bottom: 80px;
+            display: flex;
+            gap: 40px
+        }
+
+        .hero-stat {
+            text-align: center;
+            color: var(--white)
+        }
+
+        .hero-stat-num {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gold)
+        }
+
+        .hero-stat-label {
+            font-size: .8rem;
+            opacity: .7;
+            letter-spacing: .5px
+        }
+
+        /* =============================================
+   FILTER BAR
+============================================= */
+        .filter-bar {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow)
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: flex-end
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 150px
+        }
+
+        .filter-group label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #888;
+            letter-spacing: .5px;
+            text-transform: uppercase
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 14px;
+            border: 1.5px solid var(--sand);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: .9rem;
+            background: var(--cream);
+            color: var(--ink);
+            transition: var(--transition);
+            outline: none
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: var(--terracotta)
+        }
+
+        /* =============================================
+   PACKAGE GRID
+============================================= */
+        #packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px
+        }
+
+        .package-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--sand);
+            display: flex;
+            flex-direction: column
+        }
+
+        .package-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg)
+        }
+
+        .card-img-wrap {
+            position: relative;
+            height: 200px;
+            overflow: hidden
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s ease
+        }
+
+        .package-card:hover .card-img-wrap img {
+            transform: scale(1.06)
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--forest);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 700
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column
+        }
+
+        .card-location {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--terracotta);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 5px
+        }
+
+        .card-name {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .card-desc {
+            font-size: .82rem;
+            color: #777;
+            line-height: 1.55;
+            flex: 1;
+            margin-bottom: 14px
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 14px;
+            border-top: 1px solid var(--mist)
+        }
+
+        .card-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--forest)
+        }
+
+        .card-price span {
+            font-size: .75rem;
+            font-weight: 400;
+            color: #888
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--ink)
+        }
+
+        .card-rating .star {
+            color: var(--gold)
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px
+        }
+
+        .card-actions .btn {
+            flex: 1;
+            justify-content: center
+        }
+
+        .no-results {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #999
+        }
+
+        .no-results h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: #bbb
+        }
+
+        /* =============================================
+   PACKAGES PAGE TABS
+============================================= */
+        .pkg-page-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 32px;
+            width: fit-content
+        }
+
+        .pkg-page-tab {
+            padding: 10px 28px;
+            font-size: .92rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: var(--transition);
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .pkg-page-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1)
+        }
+
+        .pkg-tab-content {
+            display: none
+        }
+
+        .pkg-tab-content.active {
+            display: block
+        }
+
+        /* My Trip Builder */
+        .mytrip-wrap {
+            max-width: 800px
+        }
+
+        .mytrip-hero {
+            background: linear-gradient(135deg, var(--forest), #1a3028);
+            border-radius: 20px;
+            padding: 36px 40px;
+            margin-bottom: 32px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden
+        }
+
+        .mytrip-hero::after {
+            content: '✈';
+            position: absolute;
+            right: 32px;
+            bottom: -10px;
+            font-size: 7rem;
+            opacity: .08
+        }
+
+        .mytrip-hero-tag {
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px
+        }
+
+        .mytrip-hero-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 8px
+        }
+
+        .mytrip-hero-sub {
+            font-size: .9rem;
+            opacity: .75;
+            line-height: 1.6
+        }
+
+        .mytrip-form-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: var(--shadow)
+        }
+
+        .mytrip-section-label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--mist)
+        }
+
+        .mytrip-activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 4px
+        }
+
+        .activity-chip {
+            padding: 8px 16px;
+            border: 1.5px solid var(--sand);
+            border-radius: 20px;
+            font-size: .82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--cream);
+            color: var(--ink);
+            user-select: none
+        }
+
+        .activity-chip.selected {
+            background: var(--forest);
+            color: var(--white);
+            border-color: var(--forest)
+        }
+
+        .activity-chip:hover:not(.selected) {
+            border-color: var(--terracotta);
+            color: var(--terracotta)
+        }
+
+        .budget-display {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--forest);
+            margin-bottom: 8px
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--terracotta);
+            height: 6px;
+            cursor: pointer
+        }
+
+        .mytrip-summary {
+            background: var(--mist);
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 24px;
+            font-size: .88rem;
+            line-height: 2;
+            border-left: 4px solid var(--terracotta)
+        }
+
+        .mytrip-summary strong {
+            color: var(--forest)
+        }
+
+        .badge-custom {
+            background: rgba(212, 169, 66, .15);
+            color: #92620a
+        }
+
+        /* =============================================
+   MODAL
+============================================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(26, 26, 26, .6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn .2s ease
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn .3s cubic-bezier(.4, 0, .2, 1);
+            max-height: 90vh;
+            overflow-y: auto
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(.92);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 28px
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--ink)
+        }
+
+        .modal-close {
+            background: var(--mist);
+            border: none;
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #888;
+            transition: var(--transition)
+        }
+
+        .modal-close:hover {
+            background: var(--sand);
+            color: var(--ink)
+        }
+
+        .form-group {
+            margin-bottom: 18px
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: .83rem;
+            font-weight: 600;
+            color: #555
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--sand);
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: .92rem;
+            background: var(--cream);
+            color: var(--ink);
+            transition: var(--transition);
+            outline: none;
+            resize: vertical
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--terracotta);
+            background: var(--white)
+        }
+
+        .form-error {
+            color: var(--rust);
+            font-size: .8rem;
+            margin-top: 5px;
+            display: none
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px
+        }
+
+        /* =============================================
+   AUTH
+============================================= */
+        .auth-wrap {
+            min-height: calc(100vh - 72px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--mist) 0%, var(--sand) 100%);
+            padding: 40px 20px
+        }
+
+        .auth-box {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 50px 44px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg)
+        }
+
+        .auth-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--forest);
+            text-align: center;
+            margin-bottom: 6px
+        }
+
+        .auth-logo span {
+            color: var(--terracotta)
+        }
+
+        .auth-tagline {
+            text-align: center;
+            color: #888;
+            font-size: .88rem;
+            margin-bottom: 32px
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 28px
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 9px;
+            text-align: center;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: var(--transition);
+            color: #888
+        }
+
+        .auth-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1)
+        }
+
+        .auth-form {
+            display: none
+        }
+
+        .auth-form.active {
+            display: block
+        }
+
+        /* =============================================
+   BOOKINGS
+============================================= */
+        .bookings-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #aaa
+        }
+
+        .bookings-empty h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 10px
+        }
+
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 22px
+        }
+
+        .booking-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition)
+        }
+
+        .booking-card:hover {
+            transform: translateY(-3px)
+        }
+
+        .booking-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 14px
+        }
+
+        .status-confirmed {
+            background: rgba(45, 74, 62, .1);
+            color: var(--forest)
+        }
+
+        .status-assigned {
+            background: rgba(37, 99, 235, .1);
+            color: var(--blue)
+        }
+
+        .status-completed {
+            background: rgba(22, 163, 74, .1);
+            color: #16a34a
+        }
+
+        .status-cancelled {
+            background: rgba(168, 67, 42, .1);
+            color: var(--rust)
+        }
+
+        .booking-pkg {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px
+        }
+
+        .booking-detail {
+            font-size: .83rem;
+            color: #777;
+            margin-bottom: 3px
+        }
+
+        .booking-detail strong {
+            color: var(--ink)
+        }
+
+        .booking-id {
+            font-size: .72rem;
+            color: #bbb;
+            margin-top: 12px;
+            font-family: monospace
+        }
+
+        /* =============================================
+   ADMIN
+============================================= */
+        .portal-login-wrap {
+            max-width: 420px;
+            margin: 0 auto
+        }
+
+        .portal-login-box {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg)
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px
+        }
+
+        .panel-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow)
+        }
+
+        .panel-card-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--mist)
+        }
+
+        .admin-pkg-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto
+        }
+
+        .admin-pkg-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--mist);
+            border-radius: 10px;
+            gap: 10px
+        }
+
+        .admin-pkg-name {
+            font-size: .88rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .admin-pkg-loc {
+            font-size: .78rem;
+            color: #999
+        }
+
+        /* =============================================
+   COMPANY DASHBOARD
+============================================= */
+        .dash-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 32px
+        }
+
+        .dash-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--sand);
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0
+        }
+
+        .stat-icon.orange {
+            background: rgba(199, 96, 58, .12)
+        }
+
+        .stat-icon.green {
+            background: rgba(45, 74, 62, .12)
+        }
+
+        .stat-icon.blue {
+            background: rgba(37, 99, 235, .1)
+        }
+
+        .stat-icon.purple {
+            background: rgba(124, 58, 237, .1)
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--ink);
+            line-height: 1
+        }
+
+        .stat-label {
+            font-size: .78rem;
+            color: #888;
+            margin-top: 4px
+        }
+
+        .company-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 28px;
+            width: fit-content
+        }
+
+        .company-tab {
+            padding: 9px 20px;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: var(--transition);
+            color: #888;
+            white-space: nowrap
+        }
+
+        .company-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1)
+        }
+
+        .company-tab-content {
+            display: none
+        }
+
+        .company-tab-content.active {
+            display: block
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .data-table th {
+            background: var(--forest);
+            color: var(--white);
+            padding: 14px 16px;
+            font-size: .8rem;
+            font-weight: 600;
+            text-align: left;
+            letter-spacing: .5px;
+            text-transform: uppercase
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            font-size: .85rem;
+            border-bottom: 1px solid var(--mist);
+            vertical-align: middle
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .data-table tr:hover td {
+            background: var(--mist)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .3px
+        }
+
+        .badge-confirmed {
+            background: rgba(45, 74, 62, .1);
+            color: var(--forest)
+        }
+
+        .badge-assigned {
+            background: rgba(37, 99, 235, .1);
+            color: var(--blue)
+        }
+
+        .badge-completed {
+            background: rgba(22, 163, 74, .1);
+            color: #16a34a
+        }
+
+        .badge-cancelled {
+            background: rgba(168, 67, 42, .1);
+            color: var(--rust)
+        }
+
+        .badge-pending {
+            background: rgba(212, 169, 66, .15);
+            color: #92620a
+        }
+
+        .badge-available {
+            background: rgba(22, 163, 74, .1);
+            color: #16a34a
+        }
+
+        .badge-busy {
+            background: rgba(124, 58, 237, .1);
+            color: var(--purple)
+        }
+
+        /* Driver management */
+        .driver-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .driver-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 14px 16px
+        }
+
+        .driver-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--forest);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .95rem;
+            flex-shrink: 0
+        }
+
+        .driver-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .driver-name {
+            font-weight: 600;
+            font-size: .9rem
+        }
+
+        .driver-meta {
+            font-size: .78rem;
+            color: #888
+        }
+
+        .assign-select {
+            padding: 7px 12px;
+            border: 1.5px solid var(--sand);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: .82rem;
+            background: var(--white);
+            color: var(--ink);
+            outline: none;
+            min-width: 180px
+        }
+
+        .assign-select:focus {
+            border-color: var(--blue)
+        }
+
+        .empty-table {
+            text-align: center;
+            padding: 48px;
+            color: #aaa;
+            font-size: .9rem
+        }
+
+        /* =============================================
+   DRIVER PORTAL
+============================================= */
+        .driver-dash-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 28px
+        }
+
+        .driver-profile-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--sand);
+            height: fit-content
+        }
+
+        .driver-avatar-lg {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), #9333ea);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 auto 16px
+        }
+
+        .driver-profile-name {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px
+        }
+
+        .driver-profile-id {
+            font-size: .78rem;
+            color: #aaa;
+            text-align: center;
+            font-family: monospace;
+            margin-bottom: 20px
+        }
+
+        .driver-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--mist);
+            font-size: .85rem
+        }
+
+        .driver-info-row:last-child {
+            border-bottom: none
+        }
+
+        .driver-info-label {
+            color: #888;
+            font-weight: 500
+        }
+
+        .driver-info-value {
+            font-weight: 600;
+            color: var(--ink)
+        }
+
+        .trips-panel {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--sand)
+        }
+
+        .trip-card {
+            border: 1px solid var(--sand);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden
+        }
+
+        .trip-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px
+        }
+
+        .trip-card.trip-new::before {
+            background: var(--blue)
+        }
+
+        .trip-card.trip-completed::before {
+            background: #16a34a
+        }
+
+        .trip-card.trip-pending::before {
+            background: var(--gold)
+        }
+
+        .trip-card:hover {
+            box-shadow: var(--shadow)
+        }
+
+        .trip-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px
+        }
+
+        .trip-pkg-name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700
+        }
+
+        .trip-details-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: .82rem;
+            color: #777;
+            margin-bottom: 10px
+        }
+
+        .trip-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .trip-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        /* =============================================
+   MAP MODAL
+============================================= */
+        .map-modal {
+            max-width: 700px
+        }
+
+        .map-modal iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 12px;
+            margin-top: 16px
+        }
+
+        /* =============================================
+   CONFIRM MODAL
+============================================= */
+        .confirm-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(45, 74, 62, .1);
+            color: var(--forest);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 24px
+        }
+
+        .confirm-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px
+        }
+
+        .confirm-subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 24px;
+            font-size: .92rem
+        }
+
+        .confirm-details {
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 18px;
+            font-size: .88rem;
+            line-height: 2
+        }
+
+        .confirm-details strong {
+            color: var(--forest)
+        }
+
+        footer {
+            background: var(--ink);
+            color: rgba(255, 255, 255, .6);
+            text-align: center;
+            padding: 28px;
+            font-size: .82rem
+        }
+
+        footer strong {
+            color: var(--white)
+        }
+
+        /* =============================================
+   PORTAL SELECTOR (landing for driver/company)
+============================================= */
+        .portal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto
+        }
+
+        .portal-select-card {
+            background: var(--white);
+            border: 2px solid var(--sand);
+            border-radius: 20px;
+            padding: 36px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow)
+        }
+
+        .portal-select-card:hover {
+            border-color: var(--terracotta);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg)
+        }
+
+        .portal-select-icon {
+            font-size: 3rem;
+            margin-bottom: 16px
+        }
+
+        .portal-select-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px
+        }
+
+        .portal-select-desc {
+            font-size: .88rem;
+            color: #888;
+            line-height: 1.6
+        }
+
+        /* =============================================
+   RESPONSIVE
+============================================= */
+        @media(max-width:900px) {
+            #navbar {
+                padding: 0 20px
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: var(--cream);
+                padding: 16px;
+                border-bottom: 1px solid var(--sand);
+                gap: 4px
+            }
+
+            .nav-links.open {
+                display: flex
+            }
+
+            .hamburger {
+                display: flex
+            }
+
+            .hero-content {
+                padding: 60px 28px
+            }
+
+            .hero-stats {
+                position: static;
+                padding: 0 28px 60px;
+                flex-wrap: wrap;
+                gap: 24px
+            }
+
+            #hero {
+                flex-direction: column;
+                align-items: flex-start
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr
+            }
+
+            .driver-dash-grid {
+                grid-template-columns: 1fr
+            }
+
+            .auth-box {
+                padding: 32px 24px
+            }
+
+            .section-wrap {
+                padding: 60px 20px
+            }
+
+            .form-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:600px) {
+            .data-table {
+                font-size: .78rem
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 10px
+            }
+        }
+
+        /* =============================================
+   PACKAGES PAGE TABS
+============================================= */
+        .pkg-page-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 32px;
+            width: fit-content
+        }
+
+        .pkg-page-tab {
+            padding: 10px 28px;
+            font-size: .92rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: var(--transition);
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .pkg-page-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1)
+        }
+
+        .pkg-tab-content {
+            display: none
+        }
+
+        .pkg-tab-content.active {
+            display: block
+        }
+
+        /* My Trip Builder */
+        .mytrip-wrap {
+            max-width: 800px
+        }
+
+        .mytrip-hero {
+            background: linear-gradient(135deg, var(--forest), #1a3028);
+            border-radius: 20px;
+            padding: 36px 40px;
+            margin-bottom: 32px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden
+        }
+
+        .mytrip-hero::after {
+            content: '\2708';
+            position: absolute;
+            right: 32px;
+            bottom: -10px;
+            font-size: 7rem;
+            opacity: .08
+        }
+
+        .mytrip-hero-tag {
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px
+        }
+
+        .mytrip-hero-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 8px
+        }
+
+        .mytrip-hero-sub {
+            font-size: .9rem;
+            opacity: .75;
+            line-height: 1.6
+        }
+
+        .mytrip-form-card {
+            background: var(--white);
+            border: 1px solid var(--sand);
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: var(--shadow)
+        }
+
+        .mytrip-section-label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--mist)
+        }
+
+        .mytrip-activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 4px
+        }
+
+        .activity-chip {
+            padding: 8px 16px;
+            border: 1.5px solid var(--sand);
+            border-radius: 20px;
+            font-size: .82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--cream);
+            color: var(--ink);
+            user-select: none
+        }
+
+        .activity-chip.selected {
+            background: var(--forest);
+            color: var(--white);
+            border-color: var(--forest)
+        }
+
+        .activity-chip:hover:not(.selected) {
+            border-color: var(--terracotta);
+            color: var(--terracotta)
+        }
+
+        .budget-display {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--forest);
+            margin-bottom: 8px
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--terracotta);
+            height: 6px;
+            cursor: pointer
+        }
+
+        .mytrip-summary {
+            background: var(--mist);
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 24px;
+            font-size: .88rem;
+            line-height: 2;
+            border-left: 4px solid var(--terracotta)
+        }
+
+        .mytrip-summary strong {
+            color: var(--forest)
+        }
+
+        .badge-custom {
+            background: rgba(212, 169, 66, .15);
+            color: #92620a
+        }
+
+        /* Admin Reports */
+        .admin-tabs {
+            display: flex;
+            gap: 0;
+            background: var(--mist);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 28px;
+            width: fit-content
+        }
+
+        .admin-tab {
+            padding: 9px 20px;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: var(--transition);
+            color: #888;
+            white-space: nowrap
+        }
+
+        .admin-tab.active {
+            background: var(--white);
+            color: var(--forest);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1)
+        }
+
+        .admin-tab-content {
+            display: none
+        }
+
+        .admin-tab-content.active {
+            display: block
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOAST -->
+    <div id="toast-container"></div>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <div class="nav-logo" onclick="showSection('home')">Safar<span>Sathii</span></div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#" onclick="showSection('home');return false">Home</a></li>
+            <li><a href="#" onclick="showSection('packages');return false">Packages</a></li>
+            <li><a href="#" onclick="requireLogin('bookings');return false">My Bookings</a></li>
+            <li><a href="#" onclick="showSection('admin');return false">Admin</a></li>
+            <li><a href="#" onclick="showSection('company');return false">🏢 Company</a></li>
+            <li><a href="#" onclick="showSection('driver');return false">🚗 Driver</a></li>
+        </ul>
+        <div class="nav-right">
+            <div id="user-info" class="hidden"></div>
+            <button class="btn btn-secondary btn-sm hidden" id="logout-btn" onclick="logout()">Logout</button>
+            <button class="btn btn-primary btn-sm" id="login-nav-btn" onclick="showSection('auth')">Sign In</button>
+        </div>
+        <div class="hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+    </nav>
+
+    <main>
+
+        <!-- ================ HOME ================ -->
+        <section id="home-section" class="active-section">
+            <div id="hero">
+                <div class="hero-bg-pattern"></div>
+                <div class="hero-content">
+                    <div class="hero-tag">✈ Your Journey Companion</div>
+                    <h1 class="hero-title">Explore the World with <em>SafarSathii</em></h1>
+                    <p class="hero-subtitle">Handcrafted travel experiences across India and beyond. Discover hidden
+                        gems, iconic destinations, and once-in-a-lifetime adventures.</p>
+                    <div class="hero-cta">
+                        <button class="btn btn-primary" onclick="showSection('packages')">Explore Packages</button>
+                        <button class="btn btn-secondary" style="color:white;border-color:rgba(255,255,255,.4)"
+                            onclick="showSection('auth')">Create Account</button>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">50+</div>
+                        <div class="hero-stat-label">Destinations</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">2K+</div>
+                        <div class="hero-stat-label">Happy Travelers</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">4.9★</div>
+                        <div class="hero-stat-label">Avg Rating</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================ AUTH ================ -->
+        <section id="auth-section">
+            <div class="auth-wrap">
+                <div class="auth-box">
+                    <div class="auth-logo">Safar<span>Sathii</span></div>
+                    <p class="auth-tagline">Your journey begins here 🌍</p>
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
+                        <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+                    </div>
+                    <!-- LOGIN -->
+                    <div class="auth-form active" id="login-form">
+                        <div class="form-group"><label>Username</label><input type="text" id="login-username"
+                                placeholder="Enter username" />
+                            <div class="form-error" id="login-user-err">Please enter username.</div>
+                        </div>
+                        <div class="form-group"><label>Password</label><input type="password" id="login-password"
+                                placeholder="Enter password" />
+                            <div class="form-error" id="login-pass-err">Please enter password.</div>
+                        </div>
+                        <div class="form-error" id="login-err" style="display:none;margin-bottom:12px;font-size:.88rem">
+                        </div>
+                        <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+                    </div>
+                    <!-- SIGNUP -->
+                    <div class="auth-form" id="signup-form">
+                        <div class="form-group"><label>Full Name</label><input type="text" id="signup-name"
+                                placeholder="Your full name" />
+                            <div class="form-error" id="signup-name-err">Please enter your name.</div>
+                        </div>
+                        <div class="form-group"><label>Username</label><input type="text" id="signup-username"
+                                placeholder="Choose a username" />
+                            <div class="form-error" id="signup-user-err">Please enter a username.</div>
+                        </div>
+                        <div class="form-group"><label>Email</label><input type="email" id="signup-email"
+                                placeholder="you@example.com" />
+                            <div class="form-error" id="signup-email-err">Please enter a valid email.</div>
+                        </div>
+                        <div class="form-group"><label>Password</label><input type="password" id="signup-password"
+                                placeholder="Min 6 characters" />
+                            <div class="form-error" id="signup-pass-err">Password must be at least 6 characters.</div>
+                        </div>
+                        <div class="form-error" id="signup-err"
+                            style="display:none;margin-bottom:12px;font-size:.88rem"></div>
+                        <button class="btn btn-primary" style="width:100%" onclick="doSignup()">Create Account</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- ================ PACKAGES ================ -->
+        <section id="packages-section">
+            <div class="section-wrap">
+                <div class="section-header">
+                    <div class="section-tag">✈ Explore</div>
+                    <h2 class="section-title">Travel Packages</h2>
+                    <p class="section-subtitle">Browse our curated packages or build your own custom trip.</p>
+                </div>
+
+                <!-- Page-level Tabs -->
+                <div class="pkg-page-tabs">
+                    <div class="pkg-page-tab active" id="ptab-browse" onclick="switchPkgTab('browse')">🌍 Browse
+                        Packages</div>
+                    <div class="pkg-page-tab" id="ptab-mytrip" onclick="switchPkgTab('mytrip')">✏️ My Trip</div>
+                </div>
+
+                <!-- TAB: Browse Packages -->
+                <div class="pkg-tab-content active" id="pcon-browse">
+                    <div class="filter-bar">
+                        <div class="filter-row">
+                            <div class="filter-group"><label>Search Destination</label><input type="text"
+                                    id="search-input" placeholder="e.g. Goa, Manali..." oninput="applyFilters()" />
+                            </div>
+                            <div class="filter-group"><label>Max Price (₹)</label>
+                                <select id="price-filter" onchange="applyFilters()">
+                                    <option value="">Any Price</option>
+                                    <option value="15000">Under ₹15,000</option>
+                                    <option value="25000">Under ₹25,000</option>
+                                    <option value="40000">Under ₹40,000</option>
+                                    <option value="60000">Under ₹60,000</option>
+                                </select>
+                            </div>
+                            <div class="filter-group"><label>Min Rating</label>
+                                <select id="rating-filter" onchange="applyFilters()">
+                                    <option value="">Any Rating</option>
+                                    <option value="4">4★ & above</option>
+                                    <option value="4.5">4.5★ & above</option>
+                                </select>
+                            </div>
+                            <div class="filter-group"><label>Sort By</label>
+                                <select id="sort-filter" onchange="applyFilters()">
+                                    <option value="">Default</option>
+                                    <option value="price-asc">Price: Low to High</option>
+                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="rating-desc">Rating: High to Low</option>
+                                    <option value="name-asc">Name: A–Z</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" style="flex:0;min-width:auto"><label>&nbsp;</label><button
+                                    class="btn btn-secondary" onclick="clearFilters()">Clear</button></div>
+                        </div>
+                    </div>
+                    <div id="packages-grid"></div>
+                </div>
+
+                <!-- TAB: My Trip -->
+                <div class="pkg-tab-content" id="pcon-mytrip">
+                    <div class="mytrip-wrap">
+                        <div class="mytrip-hero">
+                            <div class="mytrip-hero-tag">✏️ Custom Trip Builder</div>
+                            <div class="mytrip-hero-title">Design Your Dream Trip</div>
+                            <p class="mytrip-hero-sub">Tell us exactly what you want — your destination, activities,
+                                budget, and dates. We'll plan it just for you and it stays private to your account.</p>
+                        </div>
+                        <div class="mytrip-form-card">
+
+                            <!-- Personal Details -->
+                            <div class="mytrip-section-label">👤 Your Details</div>
+                            <div class="form-row" style="margin-bottom:18px">
+                                <div class="form-group"><label>Full Name</label><input type="text" id="mt-name"
+                                        placeholder="As on ID proof" />
+                                    <div class="form-error" id="mt-name-err">Required.</div>
+                                </div>
+                                <div class="form-group"><label>Phone Number</label><input type="text" id="mt-phone"
+                                        placeholder="10-digit number" />
+                                    <div class="form-error" id="mt-phone-err">Enter valid 10-digit number.</div>
+                                </div>
+                            </div>
+
+                            <!-- Destination -->
+                            <div class="mytrip-section-label">📍 Destination</div>
+                            <div class="form-row" style="margin-bottom:18px">
+                                <div class="form-group"><label>Where do you want to go?</label><input type="text"
+                                        id="mt-destination" placeholder="e.g. Leh-Ladakh, Meghalaya..." />
+                                    <div class="form-error" id="mt-dest-err">Required.</div>
+                                </div>
+                                <div class="form-group"><label>Trip Type</label>
+                                    <select id="mt-triptype">
+                                        <option value="Solo">Solo Adventure</option>
+                                        <option value="Couple">Couple Getaway</option>
+                                        <option value="Family">Family Trip</option>
+                                        <option value="Friends">Friends Group</option>
+                                        <option value="Corporate">Corporate Outing</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dates & Duration -->
+                            <div class="mytrip-section-label">📅 Dates & Duration</div>
+                            <div class="form-row" style="margin-bottom:18px">
+                                <div class="form-group"><label>Start Date</label><input type="date" id="mt-startdate" />
+                                    <div class="form-error" id="mt-date-err">Please pick a future date.</div>
+                                </div>
+                                <div class="form-group"><label>Number of Days</label>
+                                    <select id="mt-days">
+                                        <option value="1">1 Day</option>
+                                        <option value="2">2 Days</option>
+                                        <option value="3">3 Days</option>
+                                        <option value="4">4 Days</option>
+                                        <option value="5">5 Days</option>
+                                        <option value="7" selected>7 Days</option>
+                                        <option value="10">10 Days</option>
+                                        <option value="14">14 Days</option>
+                                        <option value="21">21 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Travelers -->
+                            <div class="mytrip-section-label">👥 Group Size</div>
+                            <div class="form-row" style="margin-bottom:18px">
+                                <div class="form-group"><label>Number of Travelers</label>
+                                    <select id="mt-travelers">
+                                        <option value="1">1 Person</option>
+                                        <option value="2">2 People</option>
+                                        <option value="3">3 People</option>
+                                        <option value="4">4 People</option>
+                                        <option value="5">5 People</option>
+                                        <option value="6">6 People</option>
+                                        <option value="8">8 People</option>
+                                        <option value="10">10+ People</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Accommodation Preference</label>
+                                    <select id="mt-hotel">
+                                        <option value="Budget">Budget (Hostels / Guesthouses)</option>
+                                        <option value="Standard" selected>Standard (3-star Hotels)</option>
+                                        <option value="Premium">Premium (4-star Hotels)</option>
+                                        <option value="Luxury">Luxury (5-star / Resorts)</option>
+                                        <option value="Camping">Camping / Tents</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Activities -->
+                            <div class="mytrip-section-label">🎯 Activities (Select all that apply)</div>
+                            <div class="mytrip-activities" id="activities-container">
+                                <div class="activity-chip" onclick="toggleActivity(this)">🏔️ Trekking</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🏖️ Beach</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🕌 Heritage & Culture</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🛕 Spiritual</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🌊 Water Sports</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🐘 Wildlife Safari</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🍽️ Food Tour</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">📸 Photography</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🧘 Wellness & Yoga</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🎿 Snow Activities</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🚵 Cycling</div>
+                                <div class="activity-chip" onclick="toggleActivity(this)">🪂 Adventure Sports</div>
+                            </div>
+                            <div class="form-error" id="mt-act-err" style="margin-top:8px;margin-bottom:0">Please select
+                                at least one activity.</div>
+
+                            <!-- Budget -->
+                            <div class="mytrip-section-label" style="margin-top:28px">💰 Budget Per Person</div>
+                            <div class="budget-display" id="budget-display">₹25,000</div>
+                            <input type="range" id="mt-budget" min="5000" max="200000" step="1000" value="25000"
+                                oninput="updateBudget()" />
+                            <div
+                                style="display:flex;justify-content:space-between;font-size:.75rem;color:#aaa;margin-top:4px;margin-bottom:18px">
+                                <span>₹5,000</span><span>₹2,00,000</span>
+                            </div>
+
+                            <!-- Special Requests -->
+                            <div class="mytrip-section-label">💬 Special Requests</div>
+                            <div class="form-group">
+                                <textarea id="mt-notes" rows="4"
+                                    placeholder="Any specific requirements? e.g. vegetarian meals, wheelchair access, anniversary surprise, specific hotels..."></textarea>
+                            </div>
+
+                            <!-- Live Summary -->
+                            <div class="mytrip-summary" id="mytrip-summary-box" style="display:none">
+                                <strong>📋 Trip Summary</strong><br />
+                                <span id="mytrip-summary-text"></span>
+                            </div>
+
+                            <div class="form-error" id="mt-general-err"
+                                style="display:none;margin-bottom:12px;font-size:.88rem"></div>
+                            <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+                                <button class="btn btn-secondary" onclick="previewMyTrip()" style="flex:1">👁 Preview
+                                    Summary</button>
+                                <button class="btn btn-primary" onclick="submitMyTrip()" style="flex:2">🚀 Send Trip
+                                    Request to Company</button>
+                            </div>
+                            <p style="font-size:.78rem;color:#aaa;text-align:center;margin-top:12px">Your custom trip
+                                request will be sent to our team. We'll plan and get back to you. It won't appear
+                                publicly.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================ BOOKINGS ================ -->
+        <section id="bookings-section">
+            <div class="section-wrap">
+                <div class="section-header">
+                    <div class="section-tag">📋 My Trips</div>
+                    <h2 class="section-title">Booking History</h2>
+                    <p class="section-subtitle">View all your past and upcoming bookings.</p>
+                </div>
+                <div id="bookings-container"></div>
+            </div>
+        </section>
+
+        <!-- ================ ADMIN ================ -->
+        <section id="admin-section">
+            <div class="section-wrap">
+                <div id="admin-login-wrap">
+                    <div class="section-header">
+                        <div class="section-tag">🔐 Admin</div>
+                        <h2 class="section-title">Admin Panel</h2>
+                    </div>
+                    <div class="portal-login-box">
+                        <div style="font-size:2.5rem;text-align:center;margin-bottom:16px">🔐</div>
+                        <div class="form-group"><label>Admin Username</label><input type="text" id="admin-user-input"
+                                placeholder="admin" /></div>
+                        <div class="form-group"><label>Admin Password</label><input type="password"
+                                id="admin-pass-input" placeholder="Admin123456" /></div>
+                        <div style="font-size:.78rem;color:#aaa;margin-bottom:14px;text-align:center">Username:
+                            <strong>admin</strong> · Password: <strong>Admin123456</strong>
+                        </div>
+                        <div class="form-error" id="admin-login-err" style="display:none;margin-bottom:12px"></div>
+                        <button class="btn btn-primary" style="width:100%" onclick="doAdminLogin()">Login as
+                            Admin</button>
+                    </div>
+                </div>
+                <div id="admin-dashboard-wrap" class="hidden">
+                    <div class="dash-header-bar">
+                        <div>
+                            <div class="section-tag">🛠 Dashboard</div>
+                            <h2 class="section-title">Admin Dashboard</h2>
+                        </div>
+                        <button class="btn btn-secondary" onclick="adminLogout()">Logout Admin</button>
+                    </div>
+                    <!-- Admin Tabs -->
+                    <div class="admin-tabs">
+                        <div class="admin-tab active" onclick="switchAdminTab('packages',event)">📦 Manage Packages
+                        </div>
+                        <div class="admin-tab" onclick="switchAdminTab('reports',event)">📊 Revenue & Reports</div>
+                    </div>
+                    <!-- Tab: Manage Packages -->
+                    <div class="admin-tab-content active" id="atab-packages">
+                        <div class="admin-grid">
+                            <div class="panel-card">
+                                <div class="panel-card-title">➕ Add New Package</div>
+                                <div class="form-group"><label>Package Name</label><input type="text" id="a-name"
+                                        placeholder="e.g. Goa Beach Escape" /></div>
+                                <div class="form-group"><label>Location</label><input type="text" id="a-location"
+                                        placeholder="e.g. Goa, India" /></div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Price (₹)</label><input type="number" id="a-price"
+                                            placeholder="12000" /></div>
+                                    <div class="form-group"><label>Rating (1-5)</label><input type="number"
+                                            id="a-rating" min="1" max="5" step="0.1" placeholder="4.5" /></div>
+                                </div>
+                                <div class="form-group"><label>Image URL</label><input type="text" id="a-image"
+                                        placeholder="https://... (leave blank for default)" /></div>
+                                <div class="form-group"><label>Description</label><textarea id="a-desc" rows="3"
+                                        placeholder="Short description..."></textarea></div>
+                                <div class="form-error" id="admin-add-err" style="display:none;margin-bottom:12px">
+                                </div>
+                                <button class="btn btn-primary" style="width:100%" onclick="adminAddPackage()">Add
+                                    Package</button>
+                            </div>
+                            <div class="panel-card">
+                                <div class="panel-card-title">📦 Manage Packages</div>
+                                <div id="admin-pkg-list" class="admin-pkg-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tab: Reports -->
+                    <div class="admin-tab-content" id="atab-reports">
+                        <div class="admin-grid">
+                            <div class="panel-card">
+                                <div class="panel-card-title">💰 Revenue Summary</div>
+                                <div id="admin-revenue-report"></div>
+                            </div>
+                            <div class="panel-card">
+                                <div class="panel-card-title">📍 Top Destinations</div>
+                                <div id="admin-destinations-report"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================ COMPANY DASHBOARD ================ -->
+        <section id="company-section">
+            <div class="section-wrap">
+                <div id="company-login-wrap">
+                    <div class="section-header">
+                        <div class="section-tag">🏢 Company</div>
+                        <h2 class="section-title">Company Dashboard</h2>
+                        <p class="section-subtitle">Manage all bookings, assign drivers, and track operations.</p>
+                    </div>
+                    <div class="portal-login-box">
+                        <div style="font-size:2.5rem;text-align:center;margin-bottom:16px">🏢</div>
+                        <div class="form-group"><label>Company Username</label><input type="text"
+                                id="company-user-input" placeholder="company" /></div>
+                        <div class="form-group"><label>Password</label><input type="password" id="company-pass-input"
+                                placeholder="company123" /></div>
+                        <div style="font-size:.78rem;color:#aaa;margin-bottom:14px;text-align:center">Username:
+                            <strong>company</strong> · Password: <strong>company123</strong>
+                        </div>
+                        <div class="form-error" id="company-login-err" style="display:none;margin-bottom:12px"></div>
+                        <button class="btn btn-blue" style="width:100%" onclick="doCompanyLogin()">Login to Company
+                            Dashboard</button>
+                    </div>
+                </div>
+                <div id="company-dashboard-wrap" class="hidden">
+                    <div class="dash-header-bar">
+                        <div>
+                            <div class="section-tag">🏢 Operations</div>
+                            <h2 class="section-title">Company Dashboard</h2>
+                        </div>
+                        <button class="btn btn-secondary" onclick="companyLogout()">Logout</button>
+                    </div>
+                    <div class="dash-stats-row" id="company-stats-row"></div>
+                    <div class="company-tabs">
+                        <div class="company-tab active" onclick="switchCompanyTab('bookings',event)">📋 All Bookings
+                        </div>
+                        <div class="company-tab" onclick="switchCompanyTab('drivers',event)">🚗 Manage Drivers</div>
+                        <div class="company-tab" onclick="switchCompanyTab('assign',event)">📌 Assign Trips</div>
+                    </div>
+                    <!-- Tab: All Bookings -->
+                    <div class="company-tab-content active" id="ctab-bookings">
+                        <div class="panel-card" style="overflow-x:auto">
+                            <div class="panel-card-title">All Customer Bookings <span
+                                    style="font-size:.78rem;color:#aaa;font-weight:400">(includes custom trip
+                                    requests)</span></div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Customer</th>
+                                        <th>Package / Destination</th>
+                                        <th>Travel Date</th>
+                                        <th>Travelers</th>
+                                        <th>Budget/Total</th>
+                                        <th>Status</th>
+                                        <th>Driver</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="company-bookings-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Tab: Manage Drivers -->
+                    <div class="company-tab-content" id="ctab-drivers">
+                        <div class="admin-grid">
+                            <div class="panel-card">
+                                <div class="panel-card-title">➕ Add Driver</div>
+                                <div class="form-group"><label>Full Name</label><input type="text" id="d-name"
+                                        placeholder="Driver full name" /></div>
+                                <div class="form-group"><label>Phone</label><input type="text" id="d-phone"
+                                        placeholder="10-digit number" /></div>
+                                <div class="form-group"><label>Vehicle Number</label><input type="text" id="d-vehicle"
+                                        placeholder="e.g. KA-01-AB-1234" /></div>
+                                <div class="form-group"><label>Vehicle Type</label>
+                                    <select id="d-vtype">
+                                        <option value="Sedan">Sedan</option>
+                                        <option value="SUV">SUV</option>
+                                        <option value="Tempo Traveller">Tempo Traveller</option>
+                                        <option value="Mini Bus">Mini Bus</option>
+                                        <option value="Luxury Coach">Luxury Coach</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Login Username</label><input type="text" id="d-username"
+                                        placeholder="driver username" /></div>
+                                <div class="form-group"><label>Login Password</label><input type="password"
+                                        id="d-password" placeholder="min 6 chars" /></div>
+                                <div class="form-error" id="driver-add-err" style="display:none;margin-bottom:12px">
+                                </div>
+                                <button class="btn btn-blue" style="width:100%" onclick="addDriver()">Add
+                                    Driver</button>
+                            </div>
+                            <div class="panel-card">
+                                <div class="panel-card-title">🚗 Driver List</div>
+                                <div id="company-driver-list" class="driver-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tab: Assign Trips -->
+                    <div class="company-tab-content" id="ctab-assign">
+                        <div class="panel-card" style="overflow-x:auto">
+                            <div
+                                style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+                                <div class="panel-card-title" style="margin-bottom:0">📌 Assign Drivers to Bookings
+                                </div>
+                                <button class="btn btn-green btn-sm" onclick="autoAssignDrivers()">⚡ Auto-Assign
+                                    Available Drivers</button>
+                            </div>
+                            <p style="font-size:.85rem;color:#888;margin-bottom:20px">Assign an available driver to each
+                                confirmed booking or custom trip request. Use Auto-Assign to fill all unassigned
+                                bookings automatically.</p>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Customer</th>
+                                        <th>Destination</th>
+                                        <th>Travel Date</th>
+                                        <th>Travelers</th>
+                                        <th>Status</th>
+                                        <th>Assign Driver</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assign-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================ DRIVER PORTAL ================ -->
+        <section id="driver-section">
+            <div class="section-wrap">
+
+                <!-- Driver Login -->
+                <div id="driver-login-wrap">
+                    <div class="section-header">
+                        <div class="section-tag">🚗 Driver</div>
+                        <h2 class="section-title">Driver Portal</h2>
+                        <p class="section-subtitle">View your assigned trips and manage your schedule.</p>
+                    </div>
+                    <div class="portal-login-box">
+                        <div style="font-size:2.5rem;text-align:center;margin-bottom:16px">🚗</div>
+                        <div class="form-group"><label>Driver Username</label><input type="text" id="driver-user-input"
+                                placeholder="Your username" /></div>
+                        <div class="form-group"><label>Password</label><input type="password" id="driver-pass-input"
+                                placeholder="Your password" /></div>
+                        <div style="font-size:.78rem;color:#aaa;margin-bottom:14px;text-align:center">Credentials
+                            provided by your company</div>
+                        <div class="form-error" id="driver-login-err" style="display:none;margin-bottom:12px"></div>
+                        <button class="btn btn-purple" style="width:100%" onclick="doDriverLogin()">Login to Driver
+                            Portal</button>
+                    </div>
+                </div>
+
+                <!-- Driver Dashboard -->
+                <div id="driver-dashboard-wrap" class="hidden">
+                    <div class="dash-header-bar">
+                        <div>
+                            <div class="section-tag">🚗 My Dashboard</div>
+                            <h2 class="section-title" id="driver-dash-title">Driver Dashboard</h2>
+                        </div>
+                        <button class="btn btn-secondary" onclick="driverLogout()">Logout</button>
+                    </div>
+
+                    <div class="driver-dash-grid">
+                        <!-- Profile Card -->
+                        <div>
+                            <div class="driver-profile-card">
+                                <div class="driver-avatar-lg" id="driver-avatar-init">D</div>
+                                <div class="driver-profile-name" id="driver-profile-name">Driver Name</div>
+                                <div class="driver-profile-id" id="driver-profile-id">ID: DRV-000</div>
+                                <div id="driver-profile-details"></div>
+                            </div>
+                            <!-- Stats for driver -->
+                            <div style="margin-top:16px">
+                                <div class="stat-card" style="margin-bottom:12px">
+                                    <div class="stat-icon purple">🗺️</div>
+                                    <div>
+                                        <div class="stat-num" id="d-stat-total">0</div>
+                                        <div class="stat-label">Total Trips</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon green">✅</div>
+                                    <div>
+                                        <div class="stat-num" id="d-stat-done">0</div>
+                                        <div class="stat-label">Completed</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trips Panel -->
+                        <div class="trips-panel">
+                            <div class="panel-card-title" style="margin-bottom:20px">🗺️ My Assigned Trips</div>
+                            <div id="driver-trips-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay hidden" id="booking-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Book This Package</div>
+                    <div style="font-size:.85rem;color:#888;margin-top:4px" id="booking-pkg-subtitle"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal('booking-modal')">✕</button>
+            </div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="b-name"
+                    placeholder="As on ID proof" />
+                <div class="form-error" id="b-name-err">Please enter your full name.</div>
+            </div>
+            <div class="form-group"><label>Phone Number</label><input type="text" id="b-phone"
+                    placeholder="10-digit mobile number" />
+                <div class="form-error" id="b-phone-err">Please enter a valid 10-digit phone number.</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Travel Date</label><input type="date" id="b-date" />
+                    <div class="form-error" id="b-date-err">Please select a future date.</div>
+                </div>
+                <div class="form-group"><label>Preferred Trip Time</label>
+                    <select id="b-time" onchange="toggleCustomTime()">
+                        <option value="06:00 AM">🌅 06:00 AM – Early Morning</option>
+                        <option value="08:00 AM" selected>☀️ 08:00 AM – Morning</option>
+                        <option value="10:00 AM">🌤️ 10:00 AM – Late Morning</option>
+                        <option value="12:00 PM">🕛 12:00 PM – Noon</option>
+                        <option value="02:00 PM">🌞 02:00 PM – Afternoon</option>
+                        <option value="04:00 PM">🌇 04:00 PM – Evening</option>
+                        <option value="06:00 PM">🌆 06:00 PM – Late Evening</option>
+                        <option value="Custom">⏰ Custom Time</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group hidden" id="b-custom-time-wrap">
+                <label>Enter Custom Time</label>
+                <input type="time" id="b-custom-time" placeholder="HH:MM" />
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>No. of Travelers</label>
+                    <select id="b-travelers">
+                        <option value="1">1 Person</option>
+                        <option value="2">2 People</option>
+                        <option value="3">3 People</option>
+                        <option value="4">4 People</option>
+                        <option value="5">5+ People</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-error" id="b-time-err" style="display:none;margin-bottom:4px">Please enter a custom time.
+            </div>
+            <div class="form-error" id="b-general-err" style="display:none;margin-bottom:12px"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="submitBooking()">Confirm
+                Booking</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="confirm-modal">
+        <div class="modal">
+            <div style="text-align:center">
+                <div class="confirm-icon">✓</div>
+                <div class="confirm-title">Booking Confirmed! 🎉</div>
+                <p class="confirm-subtitle">Your adventure is set. Get ready to explore!</p>
+                <div class="confirm-details" id="confirm-details-body"></div>
+                <button class="btn btn-primary" style="width:100%;margin-top:24px"
+                    onclick="closeModal('confirm-modal');showSection('bookings')">View My Bookings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal-overlay hidden" id="map-modal">
+        <div class="modal map-modal">
+            <div class="modal-header">
+                <div class="modal-title" id="map-title">Location Map</div>
+                <button class="modal-close" onclick="closeModal('map-modal')">✕</button>
+            </div>
+            <iframe id="map-iframe" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+
+    <footer>
+        <p>Made with ♥ by <strong>SafarSathii</strong> — Your Journey Companion &copy; 2025</p>
+    </footer>
+
+    <!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+    <script>
+        /* ================================================================
+           ✅  STEP 1 — PASTE YOUR SUPABASE CREDENTIALS HERE
+           Get them from: supabase.com → Your Project → Settings → API
+        ================================================================ */
+        const SUPABASE_URL = 'https://qxylwcemoyctebkxhsgr.supabase.co';  // ← Replace
+        const SUPABASE_KEY = 'sb_publishable_feDpUdYseU-Y8nSaNBXwmw_5wgCVhw3';                 // ← Replace
+        /* ================================================================
+           ✅  STEP 2 — CREATE THESE TABLES IN SUPABASE (Table Editor):
+           • packages  — id(text), name, location, price(int8), rating(float8),
+                         image, description
+           • users     — id(text), name, username, email, password, joined
+           • bookings  — id(text), userId, userName, pkgId, pkgName, pkgLocation,
+                         pkgPrice(int8), travelerName, phone, date, tripTime,
+                         travelers(int8), totalPrice(int8), bookedAt, status,
+                         driverId, driverName, driverPhone, driverVehicle,
+                         driverVehicleType, type, days(int8), tripType, hotel,
+                         activities(text), notes
+           • drivers   — id(text), name, phone, vehicle, vehicleType, username,
+                         password, addedAt
+           ✅  STEP 3 — In each table: Authentication → disable RLS
+                       (or allow anon read/write policy)
+        ================================================================ */
+
+        /* ================================================================
+           SUPABASE CLIENT
+        ================================================================ */
+        const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* ================================================================
+           DEFAULT DATA
+        ================================================================ */
+        const DEFAULT_PACKAGES = [
+            { id: 'pkg1', name: 'Kerala Backwaters Serenity', location: 'Kerala, India', price: 18500, rating: 4.8, image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80', description: 'Float through emerald backwaters on a traditional houseboat surrounded by lush paddy fields.' },
+            { id: 'pkg2', name: 'Goa Sun & Sand Escape', location: 'Goa, India', price: 12800, rating: 4.6, image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80', description: 'Relax on Goa\'s sun-kissed beaches, enjoy vibrant nightlife and Portuguese heritage.' },
+            { id: 'pkg3', name: 'Himalayan Snow Trek – Manali', location: 'Manali, Himachal Pradesh', price: 22000, rating: 4.9, image: 'https://images.unsplash.com/photo-1527489377706-5bf97e608852?w=600&q=80', description: 'Trek through snow-capped peaks, alpine meadows and serene mountain villages.' },
+            { id: 'pkg4', name: 'Rajasthan Royal Heritage Tour', location: 'Jaipur, Rajasthan', price: 31000, rating: 4.7, image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80', description: 'Explore the Pink City\'s magnificent forts, palaces and the opulent royal culture.' },
+            { id: 'pkg5', name: 'Andaman Island Adventure', location: 'Andaman & Nicobar', price: 38000, rating: 4.8, image: 'https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600&q=80', description: 'Crystal-clear waters, coral reefs and tropical forests await in this island paradise.' },
+            { id: 'pkg6', name: 'Varanasi Spiritual Journey', location: 'Varanasi, Uttar Pradesh', price: 10500, rating: 4.5, image: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=600&q=80', description: 'Experience the ancient ghats, sunrise boat rides and the eternal spiritual energy of Kashi.' },
+            { id: 'pkg7', name: 'Coorg Coffee Trail', location: 'Coorg, Karnataka', price: 14200, rating: 4.6, image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&q=80', description: 'Walk through misty coffee and spice plantations in the Scotland of India.' },
+            { id: 'pkg8', name: 'Spiti Valley Expedition', location: 'Spiti Valley, Himachal', price: 28000, rating: 4.9, image: 'https://images.unsplash.com/photo-1617369120004-4042c1a42e07?w=600&q=80', description: 'Journey to remote monasteries and stark high-altitude deserts under a vast open sky.' },
+            { id: 'pkg9', name: 'Mysuru Palaces & Heritage', location: 'Mysuru, Karnataka', price: 9800, rating: 4.5, image: 'https://images.unsplash.com/photo-1600100399109-3c855e5d1517?w=600&q=80', description: 'Marvel at the illuminated Mysore Palace and indulge in rich Wodeyar-era heritage.' }
+        ];
+
+        /* ================================================================
+           STATE
+        ================================================================ */
+        let packages = [];
+        let bookings = [];
+        let users = [];
+        let drivers = [];
+        let currentUser = JSON.parse(localStorage.getItem('ss_current_user') || 'null');
+        let adminLoggedIn = false;
+        let companyLoggedIn = false;
+        let currentDriver = null;
+        let currentBookingPkg = null;
+
+        /* ================================================================
+           SUPABASE HELPERS
+        ================================================================ */
+        // Table name mapping: logical name → actual Supabase table name
+        const TABLE = {
+            packages: 'ss_packages',
+            bookings: 'ss_bookings',
+            users: 'ss_users',
+            drivers: 'ss_drivers',
+        };
+
+        async function dbLoad() {
+            const [pkgRes, bkRes, usrRes, drvRes] = await Promise.all([
+                _sb.from(TABLE.packages).select('*'),
+                _sb.from(TABLE.bookings).select('*'),
+                _sb.from(TABLE.users).select('*'),
+                _sb.from(TABLE.drivers).select('*'),
+            ]);
+            packages = pkgRes.data || [];
+            bookings = bkRes.data || [];
+            users = usrRes.data || [];
+            drivers = drvRes.data || [];
+            // Seed default packages on first run
+            if (!packages.length) {
+                const { data } = await _sb.from(TABLE.packages).insert(DEFAULT_PACKAGES).select();
+                if (data) packages = data;
+            }
+        }
+        async function dbInsert(table, row) {
+            const tbl = TABLE[table] || table;
+            const { error } = await _sb.from(tbl).insert([row]);
+            if (error) { console.error(tbl, error); showToast('Database error. Check Supabase setup.', 'error'); return false; }
+            return true;
+        }
+        async function dbUpdate(table, row, idField = 'id') {
+            const tbl = TABLE[table] || table;
+            const { error } = await _sb.from(tbl).update(row).eq(idField, row[idField] ?? row.id);
+            if (error) { console.error(tbl, error); showToast('Database error.', 'error'); return false; }
+            return true;
+        }
+        async function dbUpdateWhere(table, updates, field, value) {
+            const tbl = TABLE[table] || table;
+            const { error } = await _sb.from(tbl).update(updates).eq(field, value);
+            if (error) { console.error(tbl, error); return false; }
+            return true;
+        }
+        async function dbDelete(table, id) {
+            const tbl = TABLE[table] || table;
+            const { error } = await _sb.from(tbl).delete().eq('id', id);
+            if (error) { console.error(tbl, error); showToast('Delete failed.', 'error'); return false; }
+            return true;
+        }
+
+        /* ================================================================
+           PERSIST (now saves to Supabase — localStorage only for session)
+        ================================================================ */
+        const save = {
+            packages: async () => { },  // handled per-operation
+            bookings: async () => { },
+            users: async () => { },
+            drivers: async () => { },
+        };
+
+        /* ================================================================
+           TOAST
+        ================================================================ */
+        function showToast(msg, type = 'success', duration = 3500) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`; t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => { t.style.animation = 'slideOut .35s ease forwards'; setTimeout(() => t.remove(), 350); }, duration);
+        }
+
+        /* ================================================================
+           NAVIGATION
+        ================================================================ */
+        function showSection(id) {
+            document.querySelectorAll('main section').forEach(s => s.classList.remove('active-section'));
+            const el = document.getElementById(id + '-section');
+            if (el) el.classList.add('active-section');
+            document.getElementById('nav-links').classList.remove('open');
+            if (id === 'packages') renderPackages();
+            if (id === 'bookings') renderBookings();
+            if (id === 'admin') initAdminView();
+            if (id === 'company') initCompanyView();
+            if (id === 'driver') initDriverView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function requireLogin(section) {
+            if (!currentUser) { showToast('Please sign in first.', 'info'); showSection('auth'); }
+            else showSection(section);
+        }
+        function toggleNav() { document.getElementById('nav-links').classList.toggle('open'); }
+
+        /* ================================================================
+           NAV UI
+        ================================================================ */
+        function updateNavUI() {
+            const info = document.getElementById('user-info'), logB = document.getElementById('logout-btn'), linB = document.getElementById('login-nav-btn');
+            if (currentUser) { info.textContent = '👤 ' + currentUser.username; info.classList.remove('hidden'); logB.classList.remove('hidden'); linB.classList.add('hidden'); }
+            else { info.classList.add('hidden'); logB.classList.add('hidden'); linB.classList.remove('hidden'); }
+        }
+
+        /* ================================================================
+           AUTH
+        ================================================================ */
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById(tab + '-form').classList.add('active');
+        }
+        async function doSignup() {
+            const name = document.getElementById('signup-name').value.trim();
+            const uname = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const pass = document.getElementById('signup-password').value;
+            let ok = true;
+            ['signup-name-err', 'signup-user-err', 'signup-email-err', 'signup-pass-err', 'signup-err'].forEach(id => document.getElementById(id).style.display = 'none');
+            if (!name) { document.getElementById('signup-name-err').style.display = 'block'; ok = false; }
+            if (!uname) { document.getElementById('signup-user-err').style.display = 'block'; ok = false; }
+            if (!email || !email.includes('@')) { document.getElementById('signup-email-err').style.display = 'block'; ok = false; }
+            if (pass.length < 6) { document.getElementById('signup-pass-err').style.display = 'block'; ok = false; }
+            if (!ok) return;
+            if (users.find(u => u.username === uname)) { const e = document.getElementById('signup-err'); e.textContent = 'Username taken.'; e.style.display = 'block'; return; }
+            const nu = { name, username: uname, email, password: pass, created_at: new Date().toISOString() };
+            const saved = await dbInsert('users', nu); if (!saved) return;
+            // fetch the newly created user to get its auto-generated id
+            const { data: newUserArr } = await _sb.from(TABLE.users).select('*').eq('username', uname);
+            const newUser = newUserArr && newUserArr[0] || nu;
+            users.push(newUser);
+            currentUser = newUser; localStorage.setItem('ss_current_user', JSON.stringify(newUser));
+            updateNavUI(); showToast('Account created! Welcome 🎉', 'success'); showSection('packages');
+        }
+        async function doLogin() {
+            const uname = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value;
+            let ok = true;
+            ['login-user-err', 'login-pass-err', 'login-err'].forEach(id => document.getElementById(id).style.display = 'none');
+            if (!uname) { document.getElementById('login-user-err').style.display = 'block'; ok = false; }
+            if (!pass) { document.getElementById('login-pass-err').style.display = 'block'; ok = false; }
+            if (!ok) return;
+            const { data: found } = await _sb.from(TABLE.users).select('*').eq('username', uname).eq('password', pass);
+            const user = found && found[0];
+            if (!user) { const e = document.getElementById('login-err'); e.textContent = 'Invalid credentials.'; e.style.display = 'block'; return; }
+            currentUser = user; localStorage.setItem('ss_current_user', JSON.stringify(user));
+            updateNavUI(); showToast(`Welcome back, ${user.name}! 👋`, 'success'); showSection('packages');
+        }
+        function logout() {
+            currentUser = null; localStorage.removeItem('ss_current_user');
+            updateNavUI(); showToast('Logged out.', 'info'); showSection('home');
+        }
+
+        /* ================================================================
+           PACKAGES – RENDER
+        ================================================================ */
+        function renderPackages(list) {
+            const grid = document.getElementById('packages-grid');
+            const pkgs = list || packages;
+            if (!pkgs.length) { grid.innerHTML = `<div class="no-results"><h3>No packages found</h3><p>Try adjusting your filters.</p></div>`; return; }
+            grid.innerHTML = pkgs.map(p => `
+    <div class="package-card">
+      <div class="card-img-wrap">
+        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80'"/>
+        <div class="card-badge">⭐ ${p.rating}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-location">📍 ${p.location}</div>
+        <div class="card-name">${p.name}</div>
+        <p class="card-desc">${p.description || ''}</p>
+        <div class="card-meta">
+          <div class="card-price">₹${Number(p.price).toLocaleString('en-IN')} <span>/person</span></div>
+          <div class="card-rating"><span class="star">★</span>${p.rating}</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openMap('${p.location}','${p.name}')">🗺 Map</button>
+          <button class="btn btn-primary btn-sm" onclick="openBooking('${p.id}')">Book Now</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+        }
+        function applyFilters() {
+            const s = document.getElementById('search-input').value.toLowerCase();
+            const mp = document.getElementById('price-filter').value;
+            const mr = document.getElementById('rating-filter').value;
+            const so = document.getElementById('sort-filter').value;
+            let r = [...packages];
+            if (s) r = r.filter(p => p.location.toLowerCase().includes(s) || p.name.toLowerCase().includes(s));
+            if (mp) r = r.filter(p => p.price <= Number(mp));
+            if (mr) r = r.filter(p => p.rating >= Number(mr));
+            if (so === 'price-asc') r.sort((a, b) => a.price - b.price);
+            if (so === 'price-desc') r.sort((a, b) => b.price - a.price);
+            if (so === 'rating-desc') r.sort((a, b) => b.rating - a.rating);
+            if (so === 'name-asc') r.sort((a, b) => a.name.localeCompare(b.name));
+            renderPackages(r);
+        }
+        function clearFilters() {
+            ['search-input', 'price-filter', 'rating-filter', 'sort-filter'].forEach(id => document.getElementById(id).value = '');
+            renderPackages();
+        }
+
+        /* ================================================================
+           MODAL HELPERS
+        ================================================================ */
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function toggleCustomTime() {
+            const v = document.getElementById('b-time').value;
+            const wrap = document.getElementById('b-custom-time-wrap');
+            if (v === 'Custom') wrap.classList.remove('hidden');
+            else wrap.classList.add('hidden');
+        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', function (e) { if (e.target === this) this.classList.add('hidden'); }); });
+
+        /* ================================================================
+           BOOKING
+        ================================================================ */
+        function openBooking(pkgId) {
+            if (!currentUser) { showToast('Please sign in to book.', 'info'); showSection('auth'); return; }
+            const pkg = packages.find(p => p.id === pkgId); if (!pkg) return;
+            currentBookingPkg = pkg;
+            document.getElementById('booking-pkg-subtitle').textContent = `${pkg.name} — ₹${Number(pkg.price).toLocaleString('en-IN')} / person`;
+            ['b-name', 'b-phone', 'b-date', 'b-custom-time'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('b-travelers').value = '1';
+            document.getElementById('b-time').value = '08:00 AM';
+            document.getElementById('b-custom-time-wrap').classList.add('hidden');
+            ['b-name-err', 'b-phone-err', 'b-date-err', 'b-time-err', 'b-general-err'].forEach(id => document.getElementById(id).style.display = 'none');
+            const tom = new Date(); tom.setDate(tom.getDate() + 1);
+            document.getElementById('b-date').min = tom.toISOString().split('T')[0];
+            openModal('booking-modal');
+        }
+        async function submitBooking() {
+            const name = document.getElementById('b-name').value.trim();
+            const phone = document.getElementById('b-phone').value.trim();
+            const date = document.getElementById('b-date').value;
+            const travelers = document.getElementById('b-travelers').value;
+            const timeSelect = document.getElementById('b-time').value;
+            const customTime = document.getElementById('b-custom-time').value;
+            const tripTime = timeSelect === 'Custom' ? (customTime || '') : timeSelect;
+            let ok = true;
+            ['b-name-err', 'b-phone-err', 'b-date-err', 'b-time-err', 'b-general-err'].forEach(id => document.getElementById(id).style.display = 'none');
+            if (!name) { document.getElementById('b-name-err').style.display = 'block'; ok = false; }
+            if (!/^\d{10}$/.test(phone)) { document.getElementById('b-phone-err').style.display = 'block'; ok = false; }
+            if (!date) { document.getElementById('b-date-err').style.display = 'block'; ok = false; }
+            else { const sel = new Date(date), tod = new Date(); tod.setHours(0, 0, 0, 0); if (sel <= tod) { document.getElementById('b-date-err').style.display = 'block'; ok = false; } }
+            if (timeSelect === 'Custom' && !customTime) { document.getElementById('b-time-err').style.display = 'block'; ok = false; }
+            if (!ok) return;
+            const booking = {
+                id: 'BK' + Date.now(), type: 'package',
+                user_id: currentUser.username, user_name: currentUser.name,
+                pkg_id: currentBookingPkg.id, pkg_name: currentBookingPkg.name,
+                pkg_location: currentBookingPkg.location, pkg_price: currentBookingPkg.price,
+                traveler_name: name, phone, date, trip_time: tripTime, travelers: Number(travelers),
+                total_price: currentBookingPkg.price * Number(travelers),
+                booked_at: new Date().toISOString(),
+                status: 'confirmed', driver_id: null, driver_name: null,
+                driver_phone: null, driver_vehicle: null, driver_vehicle_type: null,
+                days: null, trip_type: null, hotel: null, activities: null, notes: null
+            };
+            bookings.push(booking);
+            const saved = await dbInsert('bookings', booking); if (!saved) { bookings.pop(); return; }
+            closeModal('booking-modal');
+            document.getElementById('confirm-details-body').innerHTML = `
+    <div><strong>Package:</strong> ${booking.pkg_name}</div>
+    <div><strong>Location:</strong> 📍 ${booking.pkg_location}</div>
+    <div><strong>Traveler:</strong> ${booking.traveler_name}</div>
+    <div><strong>Travel Date:</strong> ${new Date(booking.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+    <div><strong>Trip Time:</strong> ⏰ ${booking.trip_time}</div>
+    <div><strong>Travelers:</strong> ${booking.travelers} person(s)</div>
+    <div><strong>Total Amount:</strong> ₹${Number(booking.total_price).toLocaleString('en-IN')}</div>
+    <div><strong>Booking ID:</strong> <span style="font-family:monospace;font-size:.8em;color:#888">${booking.id}</span></div>`;
+            openModal('confirm-modal');
+            showToast('Booking confirmed! 🌍', 'success');
+        }
+
+        /* ================================================================
+           BOOKINGS PAGE
+        ================================================================ */
+        function renderBookings() {
+            if (!currentUser) { showSection('auth'); return; }
+            const cont = document.getElementById('bookings-container');
+            const mine = bookings.filter(b => b.user_id === currentUser.username).sort((a, b) => new Date(b.booked_at) - new Date(a.booked_at));
+            if (!mine.length) {
+                cont.innerHTML = `<div class="bookings-empty"><h3>No bookings yet</h3><p>Explore packages and book your first adventure!</p><button class="btn btn-primary" style="margin-top:20px" onclick="showSection('packages')">Browse Packages</button></div>`;
+                return;
+            }
+            cont.innerHTML = `<div class="bookings-grid">` + mine.map(b => {
+                const sc = b.status === 'assigned' ? 'status-assigned' : b.status === 'completed' ? 'status-completed' : b.status === 'cancelled' ? 'status-cancelled' : b.status === 'pending' ? 'status-assigned' : 'status-confirmed';
+                const sl = b.status === 'assigned' ? '✔ Driver Assigned' : b.status === 'completed' ? '✅ Completed' : b.status === 'cancelled' ? '❌ Cancelled' : b.status === 'pending' ? '⏳ Request Sent' : '✓ Confirmed';
+                const driverInfo = b.driver_name ? `<div class="booking-detail">🚗 <strong>Driver:</strong> ${b.driver_name} ${b.driver_phone ? '· ' + b.driver_phone : ''}</div>` : '';
+                return `<div class="booking-card">
+      <div class="booking-status ${sc}">${sl}</div>
+      <div class="booking-pkg">${b.pkg_name}</div>
+      <div class="booking-detail">📍 <strong>Location:</strong> ${b.pkg_location}</div>
+      <div class="booking-detail">📅 <strong>Travel Date:</strong> ${new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+      ${b.trip_time ? `<div class="booking-detail">⏰ <strong>Trip Time:</strong> ${b.trip_time}</div>` : ''}
+      <div class="booking-detail">👥 <strong>Travelers:</strong> ${b.travelers} person(s)</div>
+      <div class="booking-detail">💰 <strong>Total Paid:</strong> ₹${Number(b.total_price).toLocaleString('en-IN')}</div>
+      ${driverInfo}
+      <div class="booking-id">Booking ID: ${b.id}</div>
+    </div>`;
+            }).join('') + `</div>`;
+        }
+
+        /* ================================================================
+           MAP
+        ================================================================ */
+        function openMap(location, name) {
+            document.getElementById('map-title').textContent = '📍 ' + name;
+            const q = encodeURIComponent(location);
+            document.getElementById('map-iframe').src = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3Rao&q=${q}`;
+            openModal('map-modal');
+        }
+
+        /* ================================================================
+           ADMIN
+        ================================================================ */
+        function initAdminView() {
+            if (adminLoggedIn) {
+                document.getElementById('admin-login-wrap').classList.add('hidden');
+                document.getElementById('admin-dashboard-wrap').classList.remove('hidden');
+                renderAdminPkgList();
+                // reset to packages tab
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                const pt = document.querySelector('.admin-tab');
+                const pc = document.getElementById('atab-packages');
+                if (pt) pt.classList.add('active');
+                if (pc) pc.classList.add('active');
+            } else {
+                document.getElementById('admin-login-wrap').classList.remove('hidden');
+                document.getElementById('admin-dashboard-wrap').classList.add('hidden');
+            }
+        }
+        function doAdminLogin() {
+            const u = document.getElementById('admin-user-input').value.trim();
+            const p = document.getElementById('admin-pass-input').value.trim();
+            const err = document.getElementById('admin-login-err'); err.style.display = 'none';
+            if (u === 'admin' && p === 'Admin123456') { adminLoggedIn = true; initAdminView(); showToast('Welcome, Admin! 🛠', 'success'); }
+            else { err.textContent = 'Invalid admin credentials.'; err.style.display = 'block'; }
+        }
+        function adminLogout() { adminLoggedIn = false; initAdminView(); }
+        function renderAdminPkgList() {
+            const list = document.getElementById('admin-pkg-list');
+            if (!packages.length) { list.innerHTML = '<p style="color:#aaa;font-size:.88rem">No packages yet.</p>'; return; }
+            list.innerHTML = packages.map(p => `
+    <div class="admin-pkg-item">
+      <div><div class="admin-pkg-name">${p.name}</div><div class="admin-pkg-loc">📍 ${p.location} · ₹${Number(p.price).toLocaleString('en-IN')}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="adminDeletePkg('${p.id}')">Delete</button>
+    </div>`).join('');
+        }
+        async function adminAddPackage() {
+            const name = document.getElementById('a-name').value.trim(), location = document.getElementById('a-location').value.trim();
+            const price = Number(document.getElementById('a-price').value), rating = Number(document.getElementById('a-rating').value);
+            const image = document.getElementById('a-image').value.trim(), desc = document.getElementById('a-desc').value.trim();
+            const err = document.getElementById('admin-add-err'); err.style.display = 'none';
+            if (!name || !location || !price || !rating) { err.textContent = 'Fill all required fields.'; err.style.display = 'block'; return; }
+            if (rating < 1 || rating > 5) { err.textContent = 'Rating must be 1–5.'; err.style.display = 'block'; return; }
+            const newPkg = { id: 'pkg' + Date.now(), name, location, price, rating, image: image || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80', description: desc || 'An amazing travel experience.' };
+            const ok = await dbInsert('packages', newPkg); if (!ok) return;
+            packages.push(newPkg);
+            renderAdminPkgList(); showToast(`"${name}" added!`, 'success');
+            ['a-name', 'a-location', 'a-price', 'a-rating', 'a-image', 'a-desc'].forEach(id => document.getElementById(id).value = '');
+        }
+        async function adminDeletePkg(id) {
+            const pkg = packages.find(p => p.id === id); if (!pkg) return;
+            if (!confirm(`Delete "${pkg.name}"?`)) return;
+            const ok = await dbDelete('packages', id); if (!ok) return;
+            packages = packages.filter(p => p.id !== id); renderAdminPkgList(); showToast('Package deleted.', 'error');
+        }
+
+        /* ================================================================
+           COMPANY DASHBOARD
+        ================================================================ */
+        function initCompanyView() {
+            if (companyLoggedIn) {
+                document.getElementById('company-login-wrap').classList.add('hidden');
+                document.getElementById('company-dashboard-wrap').classList.remove('hidden');
+                renderCompanyStats(); renderCompanyBookings(); renderCompanyDriverList(); renderAssignTable(); renderReports();
+            } else {
+                document.getElementById('company-login-wrap').classList.remove('hidden');
+                document.getElementById('company-dashboard-wrap').classList.add('hidden');
+            }
+        }
+        function doCompanyLogin() {
+            const u = document.getElementById('company-user-input').value.trim();
+            const p = document.getElementById('company-pass-input').value.trim();
+            const err = document.getElementById('company-login-err'); err.style.display = 'none';
+            if (u === 'company' && p === 'company123') { companyLoggedIn = true; initCompanyView(); showToast('Welcome to Company Dashboard! 🏢', 'success'); }
+            else { err.textContent = 'Invalid company credentials.'; err.style.display = 'block'; }
+        }
+        function companyLogout() { companyLoggedIn = false; initCompanyView(); showToast('Logged out.', 'info'); }
+
+        function switchCompanyTab(tab, evt) {
+            document.querySelectorAll('.company-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.company-tab-content').forEach(c => c.classList.remove('active'));
+            if (evt && evt.target) evt.target.classList.add('active');
+            document.getElementById('ctab-' + tab).classList.add('active');
+            if (tab === 'bookings') renderCompanyBookings();
+            if (tab === 'drivers') renderCompanyDriverList();
+            if (tab === 'assign') renderAssignTable();
+            // reports moved to admin
+        }
+
+        function renderCompanyStats() {
+            const total = bookings.length;
+            const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+            const assigned = bookings.filter(b => b.status === 'assigned' || b.status === 'completed').length;
+            const revenue = bookings.filter(b => b.status !== 'cancelled').reduce((s, b) => s + (b.total_price || 0), 0);
+            document.getElementById('company-stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-icon orange">📋</div><div><div class="stat-num">${total}</div><div class="stat-label">Total Bookings</div></div></div>
+    <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-num">${confirmed}</div><div class="stat-label">Pending Assignment</div></div></div>
+    <div class="stat-card"><div class="stat-icon blue">🚗</div><div><div class="stat-num">${assigned}</div><div class="stat-label">Driver Assigned</div></div></div>
+    <div class="stat-card"><div class="stat-icon purple">💰</div><div><div class="stat-num">₹${(revenue / 1000).toFixed(0)}K</div><div class="stat-label">Total Revenue</div></div></div>
+    <div class="stat-card"><div class="stat-icon green">🧑‍✈️</div><div><div class="stat-num">${drivers.length}</div><div class="stat-label">Drivers</div></div></div>`;
+        }
+
+        function renderCompanyBookings() {
+            const tbody = document.getElementById('company-bookings-tbody');
+            if (!bookings.length) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-table">No bookings yet. Customers haven't booked anything.</div></td></tr>`; return; }
+            tbody.innerHTML = bookings.slice().sort((a, b) => new Date(b.booked_at) - new Date(a.booked_at)).map(b => {
+                const bc = { 'confirmed': 'badge-confirmed', 'assigned': 'badge-assigned', 'completed': 'badge-completed', 'cancelled': 'badge-cancelled', 'pending': 'badge-pending' }[b.status] || 'badge-pending';
+                const sl = { 'confirmed': 'Confirmed', 'assigned': 'Assigned', 'completed': 'Completed', 'cancelled': 'Cancelled', 'pending': 'Pending' }[b.status] || b.status;
+                const typeTag = b.type === 'custom' ? '<span class="badge badge-custom">✏️ Custom</span>' : '<span class="badge badge-confirmed">🌍 Package</span>';
+                return `<tr>
+      <td><span style="font-family:monospace;font-size:.75rem">${b.id}</span></td>
+      <td>${typeTag}</td>
+      <td><strong>${b.traveler_name}</strong><br><span style="color:#888;font-size:.75rem">${b.user_id}</span></td>
+      <td>${b.pkg_name}</td>
+      <td>${new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}<br><span style="color:#888;font-size:.75rem">⏰ ${b.trip_time || '—'}</span></td>
+      <td>${b.travelers}</td>
+      <td>₹${Number(b.total_price || b.pkg_price || 0).toLocaleString('en-IN')}</td>
+      <td><span class="badge ${bc}">${sl}</span></td>
+      <td>${b.driver_name || '<span style="color:#aaa">—</span>'}</td>
+    </tr>`;
+            }).join('');
+        }
+
+        function renderCompanyDriverList() {
+            const cont = document.getElementById('company-driver-list');
+            if (!drivers.length) { cont.innerHTML = '<p style="color:#aaa;font-size:.88rem;text-align:center;padding:20px">No drivers added yet.</p>'; return; }
+            cont.innerHTML = drivers.map(d => {
+                const trips = bookings.filter(b => b.driver_id === d.id).length;
+                const busy = bookings.some(b => b.driver_id === d.id && b.status === 'assigned');
+                return `<div class="driver-row">
+      <div class="driver-avatar">${d.name.charAt(0).toUpperCase()}</div>
+      <div class="driver-info">
+        <div class="driver-name">${d.name}</div>
+        <div class="driver-meta">📞 ${d.phone} · 🚗 ${d.vehicle} (${d.vehicle_type})</div>
+        <div class="driver-meta">Trips: ${trips} · <span class="badge ${busy ? 'badge-busy' : 'badge-available'}">${busy ? 'Busy' : 'Available'}</span></div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteDriver('${d.id}')">Remove</button>
+    </div>`;
+            }).join('');
+        }
+
+        function renderAssignTable() {
+            const tbody = document.getElementById('assign-tbody');
+            const assignable = bookings.filter(b => b.status === 'confirmed' || b.status === 'assigned' || b.status === 'pending');
+            if (!assignable.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-table">No bookings to assign. Wait for customers to book.</div></td></tr>`; return; }
+            tbody.innerHTML = assignable.map(b => {
+                const bc = b.status === 'assigned' ? 'badge-assigned' : 'badge-confirmed';
+                const driverOpts = drivers.map(d => `<option value="${d.id}" ${b.driver_id === d.id ? 'selected' : ''}>${d.name} (${d.vehicle_type})</option>`).join('');
+                const typeTag2 = b.type === 'custom' ? '<span class="badge badge-custom">✏️ Custom</span>' : '<span class="badge badge-confirmed">🌍 Pkg</span>';
+                return `<tr>
+      <td><span style="font-family:monospace;font-size:.75rem">${b.id}</span></td>
+      <td>${typeTag2}</td>
+      <td><strong>${b.traveler_name}</strong><br><span style="color:#888;font-size:.75rem">📞 ${b.phone}</span></td>
+      <td>${b.pkg_name}</td>
+      <td>${new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}<br><span style="color:#888;font-size:.75rem">⏰ ${b.trip_time || '—'}</span></td>
+      <td>${b.travelers} pax</td>
+      <td><span class="badge ${bc}">${b.status}</span></td>
+      <td>
+        ${drivers.length ? `<select class="assign-select" id="sel-${b.id}"><option value="">-- Select Driver --</option>${driverOpts}</select>` : `<span style="color:#aaa;font-size:.82rem">No drivers available</span>`}
+      </td>
+      <td>
+        ${drivers.length ? `<button class="btn btn-blue btn-sm" onclick="assignDriver('${b.id}')">Assign</button>` : ''}
+        ${b.status === 'assigned' ? `<button class="btn btn-green btn-sm" style="margin-top:4px" onclick="markComplete('${b.id}')">Complete</button>` : ''}
+      </td>
+    </tr>`;
+            }).join('');
+        }
+
+        async function assignDriver(bookingId) {
+            const sel = document.getElementById('sel-' + bookingId);
+            if (!sel || !sel.value) { showToast('Please select a driver.', 'error'); return; }
+            const driver = drivers.find(d => d.id === sel.value);
+            if (!driver) { showToast('Driver not found.', 'error'); return; }
+            const b = bookings.find(bk => bk.id === bookingId);
+            if (!b) return;
+            const updates = { driver_id: driver.id, driver_name: driver.name, driver_phone: driver.phone, driver_vehicle: driver.vehicle, driver_vehicle_type: driver.vehicle_type, status: 'assigned' };
+            const ok = await dbUpdateWhere('bookings', updates, 'id', bookingId); if (!ok) return;
+            Object.assign(b, updates);
+            renderCompanyStats(); renderCompanyBookings(); renderCompanyDriverList(); renderAssignTable();
+            showToast(`Driver "${driver.name}" assigned!`, 'success');
+        }
+
+        async function autoAssignDrivers() {
+            if (!drivers.length) { showToast('No drivers available. Add drivers first.', 'error'); return; }
+            const unassigned = bookings.filter(b => (b.status === 'confirmed' || b.status === 'pending') && !b.driver_id);
+            if (!unassigned.length) { showToast('No unassigned bookings to auto-assign.', 'info'); return; }
+            // Sort drivers by least current workload
+            const workload = {};
+            drivers.forEach(d => { workload[d.id] = bookings.filter(b => b.driver_id === d.id && b.status === 'assigned').length; });
+            const sorted = drivers.slice().sort((a, b) => workload[a.id] - workload[b.id]);
+            let count = 0;
+            for (let i = 0; i < unassigned.length; i++) {
+                const b = unassigned[i];
+                const driver = sorted[i % sorted.length];
+                const updates = { driver_id: driver.id, driver_name: driver.name, driver_phone: driver.phone, driver_vehicle: driver.vehicle, driver_vehicle_type: driver.vehicle_type, status: 'assigned' };
+                const ok = await dbUpdateWhere('bookings', updates, 'id', b.id);
+                if (ok) { Object.assign(b, updates); count++; }
+            }
+            renderCompanyStats(); renderCompanyBookings(); renderCompanyDriverList(); renderAssignTable();
+            showToast(`✅ Auto-assigned ${count} booking${count !== 1 ? 's' : ''} to drivers!`, 'success');
+        }
+
+        async function markComplete(bookingId) {
+            const b = bookings.find(bk => bk.id === bookingId);
+            if (!b) return;
+            const ok = await dbUpdateWhere('bookings', { status: 'completed' }, 'id', bookingId); if (!ok) return;
+            b.status = 'completed';
+            renderCompanyStats(); renderCompanyBookings(); renderCompanyDriverList(); renderAssignTable();
+            showToast('Trip marked as completed ✅', 'success');
+        }
+
+        function renderReports() {
+            // Revenue
+            const totalRev = bookings.filter(b => b.status !== 'cancelled').reduce((s, b) => s + (b.total_price || 0), 0);
+            const thisMonth = bookings.filter(b => { const d = new Date(b.booked_at); const n = new Date(); return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear() && b.status !== 'cancelled'; }).reduce((s, b) => s + (b.total_price || 0), 0);
+            document.getElementById('revenue-report').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Total Revenue</span><strong>₹${Number(totalRev).toLocaleString('en-IN')}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>This Month</span><strong>₹${Number(thisMonth).toLocaleString('en-IN')}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Total Bookings</span><strong>${bookings.length}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Completed Trips</span><strong>${bookings.filter(b => b.status === 'completed').length}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Active Drivers</span><strong>${drivers.length}</strong></div>
+    </div>`;
+
+            // Top destinations
+            const destMap = {};
+            bookings.forEach(b => { destMap[b.pkg_location] = (destMap[b.pkg_location] || 0) + 1; });
+            const sorted = Object.entries(destMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            document.getElementById('destinations-report').innerHTML = sorted.length
+                ? sorted.map(([loc, count], i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px;margin-bottom:10px"><span>${i + 1}. ${loc}</span><strong>${count} booking${count > 1 ? 's' : ''}</strong></div>`).join('')
+                : '<p style="color:#aaa;text-align:center;padding:20px">No booking data yet.</p>';
+        }
+
+        /* ================================================================
+           DRIVER MANAGEMENT (from company)
+        ================================================================ */
+        async function addDriver() {
+            const name = document.getElementById('d-name').value.trim();
+            const phone = document.getElementById('d-phone').value.trim();
+            const vehicle = document.getElementById('d-vehicle').value.trim();
+            const vehicleType = document.getElementById('d-vtype').value;
+            const username = document.getElementById('d-username').value.trim();
+            const password = document.getElementById('d-password').value;
+            const err = document.getElementById('driver-add-err'); err.style.display = 'none';
+            if (!name || !phone || !vehicle || !username || !password) { err.textContent = 'Please fill all fields.'; err.style.display = 'block'; return; }
+            if (!/^\d{10}$/.test(phone)) { err.textContent = 'Phone must be 10 digits.'; err.style.display = 'block'; return; }
+            if (password.length < 6) { err.textContent = 'Password min 6 characters.'; err.style.display = 'block'; return; }
+            if (drivers.find(d => d.username === username)) { err.textContent = 'Driver username already exists.'; err.style.display = 'block'; return; }
+            const d = { id: 'DRV' + Date.now(), name, phone, vehicle, vehicle_type: vehicleType, username, password, added_at: new Date().toISOString() };
+            const ok = await dbInsert('drivers', d); if (!ok) return;
+            drivers.push(d);
+            ['d-name', 'd-phone', 'd-vehicle', 'd-username', 'd-password'].forEach(id => document.getElementById(id).value = '');
+            renderCompanyDriverList(); renderCompanyStats();
+            showToast(`Driver "${name}" added!`, 'success');
+        }
+        async function deleteDriver(id) {
+            const d = drivers.find(dr => dr.id === id); if (!d) return;
+            if (!confirm(`Remove driver "${d.name}"?`)) return;
+            // Unassign bookings in Supabase
+            const affected = bookings.filter(b => b.driver_id === id);
+            for (const b of affected) {
+                await dbUpdateWhere('bookings', { driver_id: null, driver_name: null, driver_phone: null, driver_vehicle: null, driver_vehicle_type: null, status: 'confirmed' }, 'id', b.id);
+                b.driver_id = null; b.driver_name = null; b.driver_phone = null; b.driver_vehicle = null; b.driver_vehicle_type = null; b.status = 'confirmed';
+            }
+            const ok = await dbDelete('drivers', id); if (!ok) return;
+            drivers = drivers.filter(dr => dr.id !== id);
+            renderCompanyDriverList(); renderCompanyStats(); renderAssignTable();
+            showToast('Driver removed.', 'error');
+        }
+
+        /* ================================================================
+           DRIVER PORTAL
+        ================================================================ */
+        function initDriverView() {
+            if (currentDriver) {
+                document.getElementById('driver-login-wrap').classList.add('hidden');
+                document.getElementById('driver-dashboard-wrap').classList.remove('hidden');
+                renderDriverDash();
+            } else {
+                document.getElementById('driver-login-wrap').classList.remove('hidden');
+                document.getElementById('driver-dashboard-wrap').classList.add('hidden');
+            }
+        }
+        async function doDriverLogin() {
+            const u = document.getElementById('driver-user-input').value.trim();
+            const p = document.getElementById('driver-pass-input').value;
+            const err = document.getElementById('driver-login-err'); err.style.display = 'none';
+            const { data: found } = await _sb.from(TABLE.drivers).select('*').eq('username', u).eq('password', p);
+            const d = found && found[0];
+            if (d) {
+                currentDriver = d;
+                // Refresh bookings from Supabase so driver sees latest assignments
+                const { data: bkData } = await _sb.from(TABLE.bookings).select('*');
+                if (bkData) bookings = bkData;
+                initDriverView(); showToast(`Welcome, ${d.name}! 🚗`, 'success');
+            } else { err.textContent = 'Invalid driver credentials. Contact your company.'; err.style.display = 'block'; }
+        }
+        function driverLogout() { currentDriver = null; initDriverView(); showToast('Logged out.', 'info'); }
+
+        function renderDriverDash() {
+            const d = currentDriver;
+            document.getElementById('driver-dash-title').textContent = `${d.name}'s Dashboard`;
+            document.getElementById('driver-avatar-init').textContent = d.name.charAt(0).toUpperCase();
+            document.getElementById('driver-profile-name').textContent = d.name;
+            document.getElementById('driver-profile-id').textContent = 'ID: ' + d.id;
+            document.getElementById('driver-profile-details').innerHTML = `
+    <div class="driver-info-row"><span class="driver-info-label">Phone</span><span class="driver-info-value">${d.phone}</span></div>
+    <div class="driver-info-row"><span class="driver-info-label">Vehicle No.</span><span class="driver-info-value">${d.vehicle}</span></div>
+    <div class="driver-info-row"><span class="driver-info-label">Vehicle Type</span><span class="driver-info-value">${d.vehicle_type}</span></div>
+    <div class="driver-info-row"><span class="driver-info-label">Username</span><span class="driver-info-value">${d.username}</span></div>`;
+
+            const myTrips = bookings.filter(b => b.driver_id === d.id).sort((a, b) => new Date(a.date) - new Date(b.date));
+            const completed = myTrips.filter(b => b.status === 'completed').length;
+            document.getElementById('d-stat-total').textContent = myTrips.length;
+            document.getElementById('d-stat-done').textContent = completed;
+
+            const cont = document.getElementById('driver-trips-container');
+            if (!myTrips.length) {
+                cont.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#aaa"><div style="font-size:3rem;margin-bottom:16px">🗺️</div><h3 style="font-family:var(--font-display);margin-bottom:8px;color:#ccc">No trips assigned yet</h3><p>Your company will assign trips here. Check back soon!</p></div>`;
+                return;
+            }
+            cont.innerHTML = myTrips.map(b => {
+                const cls = b.status === 'completed' ? 'trip-completed' : b.status === 'assigned' ? 'trip-new' : 'trip-pending';
+                const badge = { 'assigned': 'badge-assigned', 'completed': 'badge-completed', 'confirmed': 'badge-confirmed' }[b.status] || 'badge-pending';
+                const statusLabel = { 'assigned': '🚗 Assigned', 'completed': '✅ Completed', 'confirmed': '⏳ Pending' }[b.status] || b.status;
+                const actionBtn = b.status === 'assigned'
+                    ? `<button class="btn btn-green btn-sm" onclick="driverMarkComplete('${b.id}')">Mark as Completed</button>`
+                    : b.status === 'completed' ? `<span style="color:#16a34a;font-size:.85rem;font-weight:600">✅ Trip Completed</span>` : '';
+                return `<div class="trip-card ${cls}">
+      <div class="trip-card-header">
+        <div class="trip-pkg-name">${b.pkg_name}</div>
+        <span class="badge ${badge}">${statusLabel}</span>
+      </div>
+      <div class="trip-details-row">
+        <div class="trip-detail-item">📍 ${b.pkg_location}</div>
+        <div class="trip-detail-item">📅 ${new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+        <div class="trip-detail-item">⏰ ${b.trip_time || '—'}</div>
+        <div class="trip-detail-item">👥 ${b.travelers} traveler(s)</div>
+      </div>
+      <div style="background:var(--mist);border-radius:10px;padding:12px;margin-bottom:12px;font-size:.83rem;line-height:1.8">
+        <div>🧑 <strong>Customer:</strong> ${b.traveler_name}</div>
+        <div>📞 <strong>Phone:</strong> ${b.phone}</div>
+        <div>💰 <strong>Trip Value:</strong> ₹${Number(b.total_price).toLocaleString('en-IN')}</div>
+        <div>🆔 <strong>Booking ID:</strong> <span style="font-family:monospace">${b.id}</span></div>
+      </div>
+      <div class="trip-actions">${actionBtn}<button class="btn btn-secondary btn-sm" onclick="openMap('${b.pkg_location}','${b.pkg_name}')">🗺 View Map</button></div>
+    </div>`;
+            }).join('');
+        }
+
+        async function driverMarkComplete(bookingId) {
+            const b = bookings.find(bk => bk.id === bookingId);
+            if (!b) return;
+            const ok = await dbUpdateWhere('bookings', { status: 'completed' }, 'id', bookingId); if (!ok) return;
+            b.status = 'completed';
+            renderDriverDash();
+            showToast('Trip marked as completed! Great work 🎉', 'success');
+        }
+
+
+        /* ================================================================
+           PACKAGES PAGE TAB SWITCH
+        ================================================================ */
+        function switchPkgTab(tab) {
+            document.querySelectorAll('.pkg-page-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pkg-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('ptab-' + tab).classList.add('active');
+            document.getElementById('pcon-' + tab).classList.add('active');
+            if (tab === 'browse') renderPackages();
+        }
+
+        /* ================================================================
+           MY TRIP BUILDER
+        ================================================================ */
+        function toggleActivity(el) { el.classList.toggle('selected'); updateMytripSummary(); }
+
+        function updateBudget() {
+            const v = Number(document.getElementById('mt-budget').value);
+            document.getElementById('budget-display').textContent = '\u20B9' + v.toLocaleString('en-IN');
+            updateMytripSummary();
+        }
+
+        function getSelectedActivities() {
+            return [...document.querySelectorAll('.activity-chip.selected')].map(el => el.textContent.trim());
+        }
+
+        function updateMytripSummary() {
+            const dest = document.getElementById('mt-destination').value.trim();
+            const days = document.getElementById('mt-days').value;
+            const travelers = document.getElementById('mt-travelers').value;
+            const hotel = document.getElementById('mt-hotel').value;
+            const budget = Number(document.getElementById('mt-budget').value);
+            const acts = getSelectedActivities();
+            if (!dest && !acts.length) { document.getElementById('mytrip-summary-box').style.display = 'none'; return; }
+            const lines = [];
+            if (dest) lines.push(`<strong>Destination:</strong> ${dest}`);
+            lines.push(`<strong>Duration:</strong> ${days} day(s)`);
+            lines.push(`<strong>Travelers:</strong> ${travelers}`);
+            lines.push(`<strong>Hotel:</strong> ${hotel}`);
+            lines.push(`<strong>Budget/person:</strong> \u20B9${budget.toLocaleString('en-IN')}`);
+            if (acts.length) lines.push(`<strong>Activities:</strong> ${acts.join(', ')}`);
+            document.getElementById('mytrip-summary-text').innerHTML = lines.join('<br/>');
+            document.getElementById('mytrip-summary-box').style.display = 'block';
+        }
+
+        function previewMyTrip() {
+            updateMytripSummary();
+            const dest = document.getElementById('mt-destination').value.trim();
+            if (dest) showToast('Summary updated below the form!', 'info');
+            else showToast('Fill in your destination first.', 'error');
+        }
+
+        async function submitMyTrip() {
+            if (!currentUser) { showToast('Please sign in to submit a custom trip.', 'info'); showSection('auth'); return; }
+            const name = document.getElementById('mt-name').value.trim();
+            const phone = document.getElementById('mt-phone').value.trim();
+            const dest = document.getElementById('mt-destination').value.trim();
+            const startdate = document.getElementById('mt-startdate').value;
+            const acts = getSelectedActivities();
+            let ok = true;
+            ['mt-name-err', 'mt-phone-err', 'mt-dest-err', 'mt-date-err', 'mt-act-err', 'mt-general-err']
+                .forEach(id => document.getElementById(id).style.display = 'none');
+            if (!name) { document.getElementById('mt-name-err').style.display = 'block'; ok = false; }
+            if (!/^\d{10}$/.test(phone)) { document.getElementById('mt-phone-err').style.display = 'block'; ok = false; }
+            if (!dest) { document.getElementById('mt-dest-err').style.display = 'block'; ok = false; }
+            if (!startdate) { document.getElementById('mt-date-err').style.display = 'block'; ok = false; }
+            else { const s = new Date(startdate), t = new Date(); t.setHours(0, 0, 0, 0); if (s <= t) { document.getElementById('mt-date-err').style.display = 'block'; ok = false; } }
+            if (!acts.length) { document.getElementById('mt-act-err').style.display = 'block'; ok = false; }
+            if (!ok) return;
+
+            const tripType = document.getElementById('mt-triptype').value;
+            const days = document.getElementById('mt-days').value;
+            const travelers = document.getElementById('mt-travelers').value;
+            const hotel = document.getElementById('mt-hotel').value;
+            const budget = Number(document.getElementById('mt-budget').value);
+            const notes = document.getElementById('mt-notes').value.trim();
+
+            // Save as a special "custom" booking that shows in company portal
+            const customBooking = {
+                id: 'CT' + Date.now(),
+                type: 'custom',
+                user_id: currentUser.username,
+                user_name: currentUser.name,
+                traveler_name: name,
+                phone,
+                pkg_id: 'custom',
+                pkg_name: `Custom Trip to ${dest}`,
+                pkg_location: dest,
+                pkg_price: budget,
+                total_price: budget * Number(travelers),
+                date: startdate,
+                travelers: Number(travelers),
+                days: Number(days),
+                trip_type: tripType,
+                hotel,
+                activities: acts,
+                notes,
+                booked_at: new Date().toISOString(),
+                status: 'pending',
+                driver_id: null, driver_name: null, driver_phone: null, trip_time: ''
+            };
+            const saved = await dbInsert('bookings', customBooking); if (!saved) return;
+            bookings.push(customBooking);
+
+            // Confirmation modal
+            document.getElementById('confirm-details-body').innerHTML = `
+    <div><strong>Trip:</strong> Custom Trip to ${dest}</div>
+    <div><strong>Duration:</strong> ${days} day(s) from ${new Date(startdate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+    <div><strong>Type:</strong> ${tripType}</div>
+    <div><strong>Travelers:</strong> ${travelers} person(s)</div>
+    <div><strong>Hotel:</strong> ${hotel}</div>
+    <div><strong>Activities:</strong> ${acts.join(', ')}</div>
+    <div><strong>Budget/person:</strong> \u20B9${budget.toLocaleString('en-IN')}</div>
+    ${notes ? `<div><strong>Notes:</strong> ${notes}</div>` : ''}
+    <div><strong>Request ID:</strong> <span style="font-family:monospace;font-size:.8em;color:#888">${customBooking.id}</span></div>`;
+            openModal('confirm-modal');
+            showToast('Custom trip request sent to company! \u2728', 'success');
+
+            // Reset form
+            ['mt-name', 'mt-phone', 'mt-destination', 'mt-startdate', 'mt-notes'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('mt-budget').value = 25000;
+            document.getElementById('budget-display').textContent = '\u20B925,000';
+            document.querySelectorAll('.activity-chip.selected').forEach(c => c.classList.remove('selected'));
+            document.getElementById('mytrip-summary-box').style.display = 'none';
+        }
+
+        /* ================================================================
+           ADMIN TABS
+        ================================================================ */
+        function switchAdminTab(tab, evt) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+            if (evt && evt.target) evt.target.classList.add('active');
+            document.getElementById('atab-' + tab).classList.add('active');
+            if (tab === 'reports') renderAdminReports();
+        }
+
+        function renderAdminReports() {
+            const allBookings = bookings;
+            const totalRev = allBookings.filter(b => b.status !== 'cancelled').reduce((s, b) => s + (b.total_price || 0), 0);
+            const thisMonth = allBookings.filter(b => {
+                const d = new Date(b.booked_at), n = new Date();
+                return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear() && b.status !== 'cancelled';
+            }).reduce((s, b) => s + (b.total_price || 0), 0);
+            const customCount = allBookings.filter(b => b.type === 'custom').length;
+            const regularCount = allBookings.filter(b => b.type !== 'custom').length;
+
+            document.getElementById('admin-revenue-report').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Total Revenue</span><strong>\u20B9${Number(totalRev).toLocaleString('en-IN')}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>This Month</span><strong>\u20B9${Number(thisMonth).toLocaleString('en-IN')}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Total Bookings</span><strong>${allBookings.length}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Regular Bookings</span><strong>${regularCount}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Custom Trip Requests</span><strong>${customCount}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Completed Trips</span><strong>${allBookings.filter(b => b.status === 'completed').length}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Active Drivers</span><strong>${drivers.length}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px"><span>Registered Users</span><strong>${users.length}</strong></div>
+    </div>`;
+
+            const destMap = {};
+            allBookings.forEach(b => { destMap[b.pkg_location] = (destMap[b.pkg_location] || 0) + 1; });
+            const sorted = Object.entries(destMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            document.getElementById('admin-destinations-report').innerHTML = sorted.length
+                ? sorted.map(([loc, count], i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--mist);border-radius:10px;margin-bottom:10px">
+        <span>${i + 1}. ${loc}</span><strong>${count} booking${count > 1 ? 's' : ''}</strong>
+      </div>`).join('')
+                : '<p style="color:#aaa;text-align:center;padding:20px">No booking data yet.</p>';
+        }
+
+        /* ================================================================
+           INIT
+        ================================================================ */
+        async function init() {
+            try {
+                await dbLoad();
+            } catch (e) {
+                console.error('Supabase connection error:', e);
+                showToast('⚠️ Could not connect to database — check your Supabase credentials in the code.', 'error', 7000);
+            }
+            updateNavUI();
+            showSection('home');
+        }
+        init();
+    </script>
+</body>
+
+</html>
